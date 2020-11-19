@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Customer {
@@ -56,5 +57,23 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, email);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Customer customer = (Customer) obj;
+        return id == customer.id
+                && Objects.equals(firstName, customer.firstName)
+                && Objects.equals(lastName, customer.lastName)
+                && Objects.equals(email, customer.email);
     }
 }
