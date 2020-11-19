@@ -1,0 +1,19 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=interstellar_arms # creates empty db and user
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # persistent folder
+volumes:
+  postgres_data:
+    external: true
+
+# to start in terminal:
+#   docker volume create --name=postgres_data
+#   docker-compose up
