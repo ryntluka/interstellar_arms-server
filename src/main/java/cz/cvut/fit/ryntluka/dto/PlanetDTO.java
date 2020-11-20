@@ -1,10 +1,12 @@
 package cz.cvut.fit.ryntluka.dto;
 
 import com.sun.istack.NotNull;
+import cz.cvut.fit.ryntluka.entity.Planet;
 
 import javax.persistence.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class PlanetDTO {
 
@@ -46,5 +48,25 @@ public class PlanetDTO {
 
     public List<Integer> getInhabitantsIds() {
         return inhabitantsIds;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, coordinate, territory, nativeRace, inhabitantsIds);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        PlanetDTO planet = (PlanetDTO) obj;
+        return id == planet.id
+                && Objects.equals(name, planet.name)
+                && Objects.equals(coordinate, planet.coordinate)
+                && Objects.equals(territory, planet.territory)
+                && Objects.equals(nativeRace, planet.nativeRace)
+                && Objects.equals(inhabitantsIds, planet.inhabitantsIds);
     }
 }

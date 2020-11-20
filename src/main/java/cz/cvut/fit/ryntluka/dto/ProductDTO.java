@@ -1,9 +1,11 @@
 package cz.cvut.fit.ryntluka.dto;
 
 import com.sun.istack.NotNull;
+import cz.cvut.fit.ryntluka.entity.Product;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 public class ProductDTO {
 
@@ -33,5 +35,23 @@ public class ProductDTO {
 
     public List<Integer> getOrdersIds() {
         return ordersIds;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, price, name, ordersIds);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        ProductDTO product = (ProductDTO) obj;
+        return id == product.id
+                && Objects.equals(price, product.price)
+                && Objects.equals(name, product.name)
+                && Objects.equals(ordersIds, product.ordersIds);
     }
 }

@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Product {
@@ -61,5 +62,23 @@ public class Product {
 
     public void setOrders(List<Customer> orders) {
         this.orders = orders;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, price, name, orders);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Product product = (Product) obj;
+        return id == product.id
+                && Objects.equals(price, product.price)
+                && Objects.equals(name, product.name)
+                && Objects.equals(orders, product.orders);
     }
 }

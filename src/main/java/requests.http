@@ -1,0 +1,16 @@
+GET http://localhost:8080/api/customers
+
+###
+
+OPTIONS http://localhost:8080/api/customers
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/json
+
+{
+  "firstName": "Lukas",
+  "lastName": "Rynt",
+  "email": "ryntluka@fit.cvut.cz"
+}

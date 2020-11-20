@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import javax.persistence.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Planet {
@@ -80,5 +81,25 @@ public class Planet {
 
     public void setInhabitants(List<Customer> inhabitants) {
         this.inhabitants = inhabitants;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, coordinate, territory, nativeRace, inhabitants);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Planet planet = (Planet) obj;
+        return id == planet.id
+                && Objects.equals(name, planet.name)
+                && Objects.equals(coordinate, planet.coordinate)
+                && Objects.equals(territory, planet.territory)
+                && Objects.equals(nativeRace, planet.nativeRace)
+                && Objects.equals(inhabitants, planet.inhabitants);
     }
 }

@@ -20,7 +20,6 @@ import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class CustomerServiceTest {
@@ -39,17 +38,16 @@ public class CustomerServiceTest {
     @Test
     void create() {
         given(customerRepository.save(customer1)).willReturn(customer1);
-        equalDTO(dto(customer1), customerService.create(createDTO(customer1)));
+        assertEquals(dto(customer1), customerService.create(createDTO(customer1)));
     }
 
     /*================================================================================================================*/
 
     @Test
     void findById() {
-        Customer customer = new Customer("Lukas", "Rynt", "ryntluka@fit.cvut.cz");
-        given(customerRepository.findById(customer.getId())).willReturn(Optional.of(customer));
-        assertEquals(Optional.of(customer), customerService.findById(customer.getId()));
-        verify(customerRepository, Mockito.atLeastOnce()).findById(customer.getId());
+        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
+        assertEquals(Optional.of(customer1), customerService.findById(customer1.getId()));
+        verify(customerRepository, Mockito.atLeastOnce()).findById(customer1.getId());
     }
 
     @Test
@@ -57,7 +55,7 @@ public class CustomerServiceTest {
         given(customerRepository.findByLastName(customer1.getLastName())).willReturn(Optional.of(customer1));
         CustomerDTO customerDTO = dto(customer1);
         CustomerDTO res = customerService.findByLastName(customer1.getLastName()).orElseThrow(EntityMissingException::new);
-        equalDTO(customerDTO, res);
+        assertEquals(customerDTO, res);
         verify(customerRepository, Mockito.atLeastOnce()).findByLastName(customer1.getLastName());
     }
 
@@ -65,7 +63,7 @@ public class CustomerServiceTest {
     void findByIdAsDTO() throws EntityMissingException {
         given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
         CustomerDTO res = customerService.findByIdAsDTO(customer1.getId()).orElseThrow(EntityMissingException::new);
-        equalDTO(res, dto(customer1));
+        assertEquals(res, dto(customer1));
         verify(customerRepository, Mockito.atLeastOnce()).findById(customer1.getId());
     }
 
@@ -83,7 +81,7 @@ public class CustomerServiceTest {
         if (answer.size() != expectedList.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            equalDTO(dto(expectedList.get(i)), answer.get(i));
+            assertEquals(dto(expectedList.get(i)), answer.get(i));
 
         verify(customerRepository, Mockito.atLeastOnce()).findAll();
     }
@@ -104,7 +102,7 @@ public class CustomerServiceTest {
         if (answer.size() != expectedList.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            equal(expectedList.get(i), answer.get(i));
+            assertEquals(expectedList.get(i), answer.get(i));
 
         verify(customerRepository, Mockito.atLeastOnce()).findAllById(ids);
     }
@@ -144,19 +142,5 @@ public class CustomerServiceTest {
 
     private CustomerDTO dto(Customer customer) {
         return new CustomerDTO(customer.getId(), customer.getFirstName(), customer.getLastName(), customer.getEmail());
-    }
-
-    private void equalDTO(CustomerDTO c1, CustomerDTO c2) {
-        assertEquals(c1.getId(), c2.getId());
-        assertEquals(c1.getFirstName(), c2.getFirstName());
-        assertEquals(c1.getLastName(), c2.getLastName());
-        assertEquals(c1.getEmail(), c2.getEmail());
-    }
-
-    private void equal(Customer c1, Customer c2) {
-        assertEquals(c1.getId(), c2.getId());
-        assertEquals(c1.getFirstName(), c2.getFirstName());
-        assertEquals(c1.getLastName(), c2.getLastName());
-        assertEquals(c1.getEmail(), c2.getEmail());
     }
 }
