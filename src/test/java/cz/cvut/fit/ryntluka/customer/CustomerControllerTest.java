@@ -37,22 +37,22 @@ public class CustomerControllerTest {
     @MockBean
     private CustomerService customerService;
 
-    @Test
-    void readOne() throws Exception {
-        Customer customer = new Customer("Lukas", "Rynt", "ryntluka@fit.cvut.cz");
-        BDDMockito.given(customerService.findById(customer.getId())).willReturn(Optional.of(customer));
-//        Assertions.assertEquals(customer, customerController.byId(customer.getId()));
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.
-                        get("/customer/{id}", customer.getFirstName()).
-                        accept("json").
-                        contentType("json")
-        ).andExpect(MockMvcResultMatchers.status().isOk()).
-                andExpect(MockMvcResultMatchers.jsonPath(".$firstName", CoreMatchers.is(customer.getFirstName())));
-
-        Mockito.verify(customerService, Mockito.atLeastOnce()).findById(customer.getId());
-    }
+//    @Test
+//    void readOne() throws Exception {
+//        Customer customer = new Customer("Lukas", "Rynt", "ryntluka@fit.cvut.cz");
+//        BDDMockito.given(customerService.findById(customer.getId())).willReturn(Optional.of(customer));
+////        Assertions.assertEquals(customer, customerController.byId(customer.getId()));
+//
+//        mockMvc.perform(
+//                MockMvcRequestBuilders.
+//                        get("/customer/{id}", customer.getFirstName()).
+//                        accept("json").
+//                        contentType("json")
+//        ).andExpect(MockMvcResultMatchers.status().isOk()).
+//                andExpect(MockMvcResultMatchers.jsonPath(".$firstName", CoreMatchers.is(customer.getFirstName())));
+//
+//        Mockito.verify(customerService, Mockito.atLeastOnce()).findById(customer.getId());
+//    }
 
 //    @Test
 //    void postNew() {

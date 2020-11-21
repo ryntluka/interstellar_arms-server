@@ -103,6 +103,21 @@ public class PlanetService {
 
     /*================================================================================================================*/
 
+    @Transactional
+    public PlanetDTO customerAddResidence(int customerId, int planetId) throws EntityMissingException {
+        Optional<Customer> optionalCustomer = customerService.findById(customerId);
+        if(optionalCustomer.isEmpty())
+            throw new EntityMissingException(customerId);
+
+        Optional<Planet> optionalPlanet = planetRepository.findById(planetId);
+        if(optionalPlanet.isEmpty())
+            throw new EntityMissingException(planetId);
+
+        Planet planet = optionalPlanet.get();
+        planet.getInhabitants().add(optionalCustomer.get());
+        return toDTO(planet);
+    }
+
     private PlanetDTO toDTO(Planet planet) {
         return new PlanetDTO(
                 planet.getId(),

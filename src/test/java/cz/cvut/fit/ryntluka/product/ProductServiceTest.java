@@ -75,6 +75,7 @@ public class ProductServiceTest {
             add(product1);
             add(product2);
             add(product3);
+
             add(product4);
         }};
         given(productRepository.findAll()).willReturn(expectedList);

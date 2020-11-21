@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 import static cz.cvut.fit.ryntluka.planet.PlanetObjects.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
@@ -31,6 +33,9 @@ public class PlanetServiceTest {
 
     @MockBean
     private PlanetRepository planetRepository;
+
+    @MockBean
+    private CustomerRepository customerRepository;
 
     @Autowired
     public PlanetServiceTest(PlanetService planetService) {
@@ -51,7 +56,7 @@ public class PlanetServiceTest {
     void findById() {
         given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
         assertEquals(Optional.of(planet1), planetService.findById(planet1.getId()));
-        verify(planetRepository, Mockito.atLeastOnce()).findById(planet1.getId());
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
     }
 
     @Test
@@ -60,7 +65,7 @@ public class PlanetServiceTest {
         PlanetDTO planetDTO = dto(planet1);
         PlanetDTO res = planetService.findByName(planet1.getName()).orElseThrow(EntityMissingException::new);
         assertEquals(planetDTO, res);
-        verify(planetRepository, Mockito.atLeastOnce()).findByName(planet1.getName());
+        verify(planetRepository, atLeastOnce()).findByName(planet1.getName());
     }
 
     @Test
@@ -68,7 +73,7 @@ public class PlanetServiceTest {
         given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
         PlanetDTO res = planetService.findByIdAsDTO(planet1.getId()).orElseThrow(EntityMissingException::new);
         assertEquals(res, dto(planet1));
-        verify(planetRepository, Mockito.atLeastOnce()).findById(planet1.getId());
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
     }
 
     @Test
@@ -87,7 +92,7 @@ public class PlanetServiceTest {
         for (int i = 0; i < answer.size(); ++i)
             assertEquals(dto(expectedList.get(i)), answer.get(i));
 
-        verify(planetRepository, Mockito.atLeastOnce()).findAll();
+        verify(planetRepository, atLeastOnce()).findAll();
     }
 
     @Test
@@ -108,7 +113,7 @@ public class PlanetServiceTest {
         for (int i = 0; i < answer.size(); ++i)
             assertEquals(expectedList.get(i), answer.get(i));
 
-        verify(planetRepository, Mockito.atLeastOnce()).findAllById(ids);
+        verify(planetRepository, atLeastOnce()).findAllById(ids);
     }
 
     /*================================================================================================================*/
@@ -126,7 +131,7 @@ public class PlanetServiceTest {
         assertEquals(updated.getInhabitantsIds(), newData.getInhabitantsIds());
         assertEquals(updated.getId(), planet1.getId());
 
-        verify(planetRepository, Mockito.atLeastOnce()).findById(planet1.getId());
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
     }
 
     /*================================================================================================================*/
@@ -136,8 +141,30 @@ public class PlanetServiceTest {
         planetRepository.deleteById(planet1.getId());
         planetService.delete(planet1.getId());
         assertEquals(Optional.empty(), planetService.findById(planet1.getId()));
-        verify(planetRepository, Mockito.atLeastOnce()).deleteById(planet1.getId());
+        verify(planetRepository, atLeastOnce()).deleteById(planet1.getId());
 
+    }
+
+    /*================================================================================================================*/
+
+    @Test
+    void customerAddResidence() throws EntityMissingException {
+        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
+        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
+
+        List<Customer> expectedList = planet1.getInhabitants();
+        expectedList.add(customer1);
+        PlanetDTO updated = planetService.customerAddResidence(customer1.getId(), planet1.getId());
+        PlanetDTO expected = dto(planet1);
+        assertEquals(updated.getCoordinate(), expected.getCoordinate());
+        assertEquals(updated.getId(), expected.getId());
+        assertEquals(updated.getName(), expected.getName());
+        assertEquals(updated.getNativeRace(), expected.getNativeRace());
+        assertEquals(updated.getTerritory(), expected.getTerritory());
+        assertEquals(updated.getInhabitantsIds(), expectedList.stream().map(Customer::getId).collect(Collectors.toList()));
+
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
+        verify(customerRepository, atLeastOnce()).findById(customer1.getId());
     }
 
     /*================================================================================================================*/
