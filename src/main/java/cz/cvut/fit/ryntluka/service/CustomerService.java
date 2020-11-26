@@ -6,6 +6,8 @@ import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,37 +28,31 @@ public class CustomerService {
     /*================================================================================================================*/
 
     @Transactional
-    public CustomerDTO create(CustomerCreateDTO customerCreateDTO) {
-        return toDTO(
-                customerRepository.save(
-                        new Customer(
-                                customerCreateDTO.getFirstName(),
-                                customerCreateDTO.getLastName(),
-                                customerCreateDTO.getEmail())
-                )
+    public Customer create(CustomerCreateDTO customerCreateDTO) {
+        return customerRepository.save(
+                new Customer(
+                        customerCreateDTO.getFirstName(),
+                        customerCreateDTO.getLastName(),
+                        customerCreateDTO.getEmail())
         );
     }
 
     /*================================================================================================================*/
 
-    public Optional<CustomerDTO> findByLastName (String lastName) {
-        return toDTO(customerRepository.findByLastName(lastName));
+    public Optional<Customer> findByLastName (String lastName) {
+        return customerRepository.findByLastName(lastName);
     }
 
-    public List<CustomerDTO> findAll() {
-        return customerRepository
-                .findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<Customer> findAll() {
+        return customerRepository.findAll();
+    }
+
+    public Page<Customer> findAll(Pageable pageable) {
+        return customerRepository.findAll(pageable);
     }
 
     public Optional<Customer> findById(int id) {
         return customerRepository.findById(id);
-    }
-
-    public Optional<CustomerDTO> findByIdAsDTO(int id) {
-        return toDTO(customerRepository.findById(id));
     }
 
     public List<Customer> findByIds(List<Integer> ids) {
@@ -66,7 +62,7 @@ public class CustomerService {
     /*================================================================================================================*/
 
     @Transactional
-    public CustomerDTO update(int id, CustomerCreateDTO customerCreateDTO) throws EntityMissingException {
+    public Customer update(int id, CustomerCreateDTO customerCreateDTO) throws EntityMissingException {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isEmpty())
             throw new EntityMissingException(id);
@@ -75,7 +71,7 @@ public class CustomerService {
         customer.setFirstName(customerCreateDTO.getFirstName());
         customer.setLastName(customerCreateDTO.getLastName());
         customer.setEmail(customerCreateDTO.getEmail());
-        return toDTO(customer);
+        return customer;
     }
 
     /*================================================================================================================*/
@@ -83,17 +79,5 @@ public class CustomerService {
     @Transactional
     public void delete(int id) {
         customerRepository.deleteById(id);
-    }
-
-    /*================================================================================================================*/
-
-    private CustomerDTO toDTO(Customer customer) {
-        return new CustomerDTO(customer.getId(), customer.getFirstName(), customer.getLastName(), customer.getEmail());
-    }
-
-    private Optional<CustomerDTO> toDTO(Optional<Customer> customer) {
-        if (customer.isEmpty())
-            return Optional.empty();
-        return Optional.of(toDTO(customer.get()));
     }
 }

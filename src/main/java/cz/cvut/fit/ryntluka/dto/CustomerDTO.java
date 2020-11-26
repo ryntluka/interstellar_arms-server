@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.Objects;
 
-public class CustomerDTO {
+public class CustomerDTO extends RepresentationModel<CustomerDTO> {
 
     private final int id;
     private final String firstName;

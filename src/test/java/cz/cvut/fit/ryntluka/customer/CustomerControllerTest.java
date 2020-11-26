@@ -1,71 +1,93 @@
 package cz.cvut.fit.ryntluka.customer;
 
-import cz.cvut.fit.ryntluka.controller.CustomerController;
+import cz.cvut.fit.ryntluka.dto.CustomerCreateDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Optional;
+
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
+import static net.minidev.json.JSONValue.toJSONString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import org.springframework.data.domain.Pageable;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CustomerControllerTest {
-    private CustomerController customerController;
 
-//    na semestrálku mockovat repository a testovat service
-//    testovat vše - tedy konkrétní třídy, ne interface, ne gettery a settery
-//    @Autowired
-//    public CustomerControllerTest(CustomerController customerController) {
-//        this.customerController = customerController;
-//    }
+    private final static String ROOT_URL = "/api/customers";
+    private final static String GET_ONE = "/{id}";
+    private final static String CONTENT_TYPE = "application/vnd-characters+json";
 
-    // takhle lepší pro rest api
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private CustomerService customerService;
 
-//    @Test
-//    void readOne() throws Exception {
-//        Customer customer = new Customer("Lukas", "Rynt", "ryntluka@fit.cvut.cz");
-//        BDDMockito.given(customerService.findById(customer.getId())).willReturn(Optional.of(customer));
-////        Assertions.assertEquals(customer, customerController.byId(customer.getId()));
-//
-//        mockMvc.perform(
-//                MockMvcRequestBuilders.
-//                        get("/customer/{id}", customer.getFirstName()).
-//                        accept("json").
-//                        contentType("json")
-//        ).andExpect(MockMvcResultMatchers.status().isOk()).
-//                andExpect(MockMvcResultMatchers.jsonPath(".$firstName", CoreMatchers.is(customer.getFirstName())));
-//
-//        Mockito.verify(customerService, Mockito.atLeastOnce()).findById(customer.getId());
-//    }
 
-//    @Test
-//    void postNew() {
-//        Customer customer = new Customer("Lukas", "Rynt", "ryntluka@fit.cvut.cz");
-//        // willThrow je negativní
-//        BDDMockito.given(customerService.create(customer));
-//        mockMvc.perform(
-//                MockMvcRequestBuilders.
-//                        post("/").
-//                        contentType("").
-//                        accept("").
-//                        content("{firstName: \"Lukas\", lastName: \"Rynt\"} ")
-//        ).andExpect(MockMvcResultMatchers.status().isCreated())
-//        .andExpect(MockMvcResultMatchers.header().exists("Location"));
-//    }
+    @Test
+    void findById() throws Exception {
+        given(customerService.findById(customer1.getId())).willReturn(Optional.of(customer1));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        get(ROOT_URL + GET_ONE, customer1.getId()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(customer1.getId()))).
+                andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
+                andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
+                andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+
+        verify(customerService, atLeastOnce()).findById(customer1.getId());
+    }
+
+    @Test
+    void findAll() throws Exception {
+        given(customerService.findAll()).willReturn(all);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        get(ROOT_URL).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk());
+
+        verify(customerService, atLeastOnce()).findAll();
+    }
+
+    @Test
+    void create() throws Exception {
+        Customer customer = new Customer("Lukáš", "Rynt", "ryntluka@fit.cvut.cz");
+        given(customerService.create(createDTO(customer))).willReturn(customer);
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        post(ROOT_URL).
+                        contentType(CONTENT_TYPE).
+                        accept(CONTENT_TYPE).
+                        content(" { \"firstName\": \"Lukáš\", \"lastName\": \"Rynt\", \"email\": \"ryntluka@fit.cvut.cz\" } ")).
+                andExpect(status().isCreated());
+        verify(customerService, atLeastOnce()).create(createDTO(customer));
+    }
 }

@@ -10,7 +10,6 @@ import cz.cvut.fit.ryntluka.repository.CustomerRepository;
 import cz.cvut.fit.ryntluka.repository.PlanetRepository;
 import cz.cvut.fit.ryntluka.service.PlanetService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -156,41 +155,14 @@ public class PlanetServiceTest {
         expectedList.add(customer1);
         PlanetDTO updated = planetService.customerAddResidence(customer1.getId(), planet1.getId());
         PlanetDTO expected = dto(planet1);
-        assertEquals(updated.getCoordinate(), expected.getCoordinate());
-        assertEquals(updated.getId(), expected.getId());
-        assertEquals(updated.getName(), expected.getName());
-        assertEquals(updated.getNativeRace(), expected.getNativeRace());
-        assertEquals(updated.getTerritory(), expected.getTerritory());
-        assertEquals(updated.getInhabitantsIds(), expectedList.stream().map(Customer::getId).collect(Collectors.toList()));
+        assertEquals(expected.getCoordinate(), updated.getCoordinate());
+        assertEquals(expected.getId(), updated.getId());
+        assertEquals(expected.getName(), updated.getName());
+        assertEquals(expected.getNativeRace(), updated.getNativeRace());
+        assertEquals(expected.getTerritory(), updated.getTerritory());
+        assertEquals(expectedList.stream().map(Customer::getId).collect(Collectors.toList()), updated.getInhabitantsIds());
 
         verify(planetRepository, atLeastOnce()).findById(planet1.getId());
         verify(customerRepository, atLeastOnce()).findById(customer1.getId());
-    }
-
-    /*================================================================================================================*/
-
-    private PlanetCreateDTO createDTO(Planet planet) {
-        return new PlanetCreateDTO(
-                planet.getName(),
-                planet.getCoordinate(),
-                planet.getTerritory(),
-                planet.getNativeRace(),
-                planet.getInhabitants().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
-    }
-
-    private PlanetDTO dto(Planet planet) {
-        return new PlanetDTO(
-                planet.getId(),
-                planet.getName(),
-                planet.getCoordinate(),
-                planet.getTerritory(),
-                planet.getNativeRace(),
-                planet.getInhabitants().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
     }
 }

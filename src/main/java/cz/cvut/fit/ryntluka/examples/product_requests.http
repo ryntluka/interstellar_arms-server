@@ -1,0 +1,32 @@
+GET http://localhost:8080/api/products/1
+
+###
+
+GET http://localhost:8080/api/products
+
+###
+
+GET http://localhost:8080/api/products?Coruscant
+
+###
+
+OPTIONS http://localhost:8080/api/products
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Coruscant",
+  "coordinate": {"x":  10, "y":  20},
+  "territory": "Core Worlds",
+  "nativeRace": "Human",
+  "inhabitants": []
+}
+
+###
+
+DELETE http://localhost:8080/api/products/1
+
+###

@@ -1,0 +1,32 @@
+GET http://localhost:8080/api/planets/1
+
+###
+
+GET http://localhost:8080/api/planets
+
+###
+
+GET http://localhost:8080/api/planets?Coruscant
+
+###
+
+OPTIONS http://localhost:8080/api/planets
+
+###
+
+POST http://localhost:8080/api/planets
+Content-Type: application/json
+
+{
+  "name": "Coruscant",
+  "coordinate": {"x":  10, "y":  20},
+  "territory": "Core Worlds",
+  "nativeRace": "Human",
+  "inhabitantsIds": [6, 7]
+}
+
+###
+
+DELETE http://localhost:8080/api/planets/1
+
+###

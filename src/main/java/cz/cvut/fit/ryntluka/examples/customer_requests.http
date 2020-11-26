@@ -1,0 +1,45 @@
+GET http://localhost:8080/api/customers/1
+Content-Type: application/vnd-characters+json
+
+###
+
+GET http://localhost:8080/api/customers
+Content-Type: application/vnd-characters+json
+
+###
+
+GET http://localhost:8080/api/customers?Rynt
+Content-Type: application/vnd-characters+json
+
+###
+
+OPTIONS http://localhost:8080/api/customers
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-characters+json
+
+{
+  "firstName": "Lukas",
+  "lastName": "Rynt",
+  "email": "ryntluka@fit.cvut.cz"
+}
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-characters+json
+
+{
+  "firstName": "Anakin",
+  "lastName": "Skywalker",
+  "email": "ani.sky@sw.com"
+}
+
+###
+
+DELETE http://localhost:8080/api/customers/5
+Content-Type: application/vnd-characters+json
+
+###

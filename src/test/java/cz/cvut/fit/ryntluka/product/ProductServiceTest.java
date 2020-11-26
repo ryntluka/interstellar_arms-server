@@ -136,27 +136,4 @@ public class ProductServiceTest {
         verify(productRepository, Mockito.atLeastOnce()).deleteById(product1.getId());
 
     }
-
-    /*================================================================================================================*/
-
-    private ProductCreateDTO createDTO(Product product) {
-        return new ProductCreateDTO(
-                product.getPrice(),
-                product.getName(),
-                product.getOrders().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
-    }
-
-    private ProductDTO dto(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getPrice(),
-                product.getName(),
-                product.getOrders().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
-    }
 }

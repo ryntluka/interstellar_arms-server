@@ -11,32 +11,44 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/products")
 public class ProductController {
 
-//    private final ProductService productService;
-//
-//    @Autowired
-//    public ProductController(ProductService productService) {
-//        this.productService = productService;
-//    }
+    private final ProductService productService;
 
-//    @GetMapping("/product/all")
-//    public List<ProductDTO> all() {
-//        return productService.findAll();
-//    }
-//
-//    @GetMapping("/product/{id}")
-//    public ProductDTO byId(@PathVariable int id) {
-//        return productService.findByIdAsDTO(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-//    }
-//
-//    @PostMapping("/product")
-//    public ProductDTO save(@RequestBody ProductCreateDTO product) throws Exception {
-//        return productService.create(product);
-//    }
-//
-//    @PutMapping("/product/{id}")
-//    public ProductDTO save(@PathVariable int id, @RequestBody ProductCreateDTO product) throws Exception {
-//        return productService.update(id, product);
-//    }
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping
+    public List<ProductDTO> readAll() {
+        return productService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ProductDTO readById(@PathVariable int id) {
+        return productService.findByIdAsDTO(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(params = {"name"})
+    public ProductDTO readByName(@RequestParam String name) {
+        return productService.findByName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping
+    public ProductDTO create(@RequestBody ProductCreateDTO product) throws Exception {
+        return productService.create(product);
+    }
+
+    @PutMapping("/{id}")
+    public ProductDTO update(@PathVariable int id, @RequestBody ProductCreateDTO product) throws Exception {
+        return productService.update(id, product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable int id) {
+        productService.delete(id);
+    }
 }
+
