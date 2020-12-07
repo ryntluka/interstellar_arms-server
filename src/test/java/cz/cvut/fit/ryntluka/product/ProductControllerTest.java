@@ -2,7 +2,9 @@ package cz.cvut.fit.ryntluka.product;
 
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.service.ProductService;
+import org.aspectj.lang.annotation.Before;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +102,13 @@ public class ProductControllerTest {
                         contentType(CONTENT_TYPE).
                         accept(CONTENT_TYPE).
                         content(toCreateJSON(product1))).
-                andExpect(status().isCreated());
+                andExpect(status().isCreated()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
+                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
         verify(productService, atLeastOnce()).create(createDTO(product1));
     }
 

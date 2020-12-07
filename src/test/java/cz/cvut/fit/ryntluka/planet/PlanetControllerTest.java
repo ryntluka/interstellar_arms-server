@@ -3,6 +3,7 @@ package cz.cvut.fit.ryntluka.planet;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.service.PlanetService;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,24 +101,24 @@ public class PlanetControllerTest {
 
     @Test
     void create() throws Exception {
-        given(planetService.create(createDTO(planet1))).willReturn(planet1);
+        given(planetService.create(createDTO(planet4))).willReturn(planet4);
         mockMvc.perform(
                 MockMvcRequestBuilders.
                         post(ROOT_URL).
                         contentType(CONTENT_TYPE).
                         accept(CONTENT_TYPE).
-                        content(toCreateJSON(planet1))).
+                        content(toCreateJSON(planet4))).
                 andExpect(status().isCreated()).
-                andExpect(jsonPath("$.id", CoreMatchers.is(planet1.getId()))).
-                andExpect(jsonPath("$.name", CoreMatchers.is(planet1.getName()))).
-                andExpect(jsonPath("$.coordinate.x", CoreMatchers.is(planet1.getCoordinate().getX()))).
-                andExpect(jsonPath("$.coordinate.y", CoreMatchers.is(planet1.getCoordinate().getY()))).
-                andExpect(jsonPath("$.territory", CoreMatchers.is(planet1.getTerritory()))).
-                andExpect(jsonPath("$.nativeRace", CoreMatchers.is(planet1.getNativeRace()))).
-                andExpect(jsonPath("$.inhabitantsIds", CoreMatchers.is(planet1.getInhabitants().stream().map(Customer::getId).collect(Collectors.toList())))).
-                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + planet1.getId()))).
+                andExpect(jsonPath("$.id", CoreMatchers.is(planet4.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(planet4.getName()))).
+                andExpect(jsonPath("$.coordinate.x", CoreMatchers.is(planet4.getCoordinate().getX()))).
+                andExpect(jsonPath("$.coordinate.y", CoreMatchers.is(planet4.getCoordinate().getY()))).
+                andExpect(jsonPath("$.territory", CoreMatchers.is(planet4.getTerritory()))).
+                andExpect(jsonPath("$.nativeRace", CoreMatchers.is(planet4.getNativeRace()))).
+                andExpect(jsonPath("$.inhabitantsIds", CoreMatchers.is(planet4.getInhabitants().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + planet4.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
-        verify(planetService, atLeastOnce()).create(createDTO(planet1));
+        verify(planetService, atLeastOnce()).create(createDTO(planet4));
     }
 
     @Test

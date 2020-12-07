@@ -2,6 +2,7 @@ package cz.cvut.fit.ryntluka.customer;
 
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
