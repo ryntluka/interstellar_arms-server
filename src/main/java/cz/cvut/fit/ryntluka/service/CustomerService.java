@@ -39,16 +39,12 @@ public class CustomerService {
 
     /*================================================================================================================*/
 
-    public Optional<Customer> findByLastName (String lastName) {
-        return customerRepository.findByLastName(lastName);
-    }
-
     public List<Customer> findAll() {
         return customerRepository.findAll();
     }
 
-    public Page<Customer> findAll(Pageable pageable) {
-        return customerRepository.findAll(pageable);
+    public Optional<Customer> findByLastName (String lastName) {
+        return customerRepository.findByLastName(lastName);
     }
 
     public Optional<Customer> findById(int id) {

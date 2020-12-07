@@ -2,48 +2,79 @@ package cz.cvut.fit.ryntluka.controller;
 
 import cz.cvut.fit.ryntluka.dto.ProductCreateDTO;
 import cz.cvut.fit.ryntluka.dto.ProductDTO;
+import cz.cvut.fit.ryntluka.dto.ProductDTOAssembler;
+import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping(value = "/api/products", produces = "application/vnd-products+json", consumes = "application/vnd-products+json")
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductDTOAssembler productDTOAssembler;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductDTOAssembler productDTOAssembler) {
         this.productService = productService;
+        this.productDTOAssembler = productDTOAssembler;
     }
 
     @GetMapping
-    public List<ProductDTO> readAll() {
-        return productService.findAll();
+    public List<ProductDTO> findAll() {
+        return productService.findAll().stream().map(productDTOAssembler::toModel).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ProductDTO readById(@PathVariable int id) {
-        return productService.findByIdAsDTO(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ProductDTO findById(@PathVariable int id) {
+        return productDTOAssembler.toModel(
+                productService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+        );
     }
 
     @GetMapping(params = {"name"})
-    public ProductDTO readByName(@RequestParam String name) {
-        return productService.findByName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ProductDTO findByName(@RequestParam String name) {
+        return productDTOAssembler.toModel(
+                productService.findByName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+        );
     }
 
     @PostMapping
-    public ProductDTO create(@RequestBody ProductCreateDTO product) throws Exception {
-        return productService.create(product);
+    public ResponseEntity<ProductDTO> create(@RequestBody ProductCreateDTO product) {
+        ProductDTO inserted;
+        try{
+            inserted = productDTOAssembler.toModel(
+                    productService.create(product)
+            );
+        }
+        catch (EntityMissingException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity
+                .created(Link.of("http://localhost:8080/api/products/" + inserted.getId()).toUri())
+                .body(inserted);
+
     }
 
     @PutMapping("/{id}")
-    public ProductDTO update(@PathVariable int id, @RequestBody ProductCreateDTO product) throws Exception {
-        return productService.update(id, product);
+    public ProductDTO update(@PathVariable int id, @RequestBody ProductCreateDTO product) {
+        try {
+            return productDTOAssembler.toModel(
+                    productService.update(id, product)
+            );
+        }
+        catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")

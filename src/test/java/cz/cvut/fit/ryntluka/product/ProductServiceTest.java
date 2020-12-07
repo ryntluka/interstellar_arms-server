@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.product.ProductObjects.all;
 import static cz.cvut.fit.ryntluka.product.ProductObjects.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -40,7 +41,7 @@ public class ProductServiceTest {
     @Test
     void create() throws EntityMissingException {
         given(productRepository.save(product1)).willReturn(product1);
-        assertEquals(dto(product1), productService.create(createDTO(product1)));
+        assertEquals(product1, productService.create(createDTO(product1)));
     }
 
     /*================================================================================================================*/
@@ -55,57 +56,34 @@ public class ProductServiceTest {
     @Test
     void findByName() throws EntityMissingException {
         given(productRepository.findByName(product1.getName())).willReturn(Optional.of(product1));
-        ProductDTO productDTO = dto(product1);
-        ProductDTO res = productService.findByName(product1.getName()).orElseThrow(EntityMissingException::new);
-        assertEquals(productDTO, res);
+        Product res = productService.findByName(product1.getName()).orElseThrow(EntityMissingException::new);
+        assertEquals(product1, res);
         verify(productRepository, Mockito.atLeastOnce()).findByName(product1.getName());
     }
 
     @Test
-    void findByIdAsDTO() throws EntityMissingException {
-        given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
-        ProductDTO res = productService.findByIdAsDTO(product1.getId()).orElseThrow(EntityMissingException::new);
-        assertEquals(res, dto(product1));
-        verify(productRepository, Mockito.atLeastOnce()).findById(product1.getId());
-    }
-
-    @Test
     void findAll() throws EntityMissingException {
-        List<Product> expectedList = new ArrayList<>() {{
-            add(product1);
-            add(product2);
-            add(product3);
+        given(productRepository.findAll()).willReturn(all);
+        List<Product> answer = productService.findAll();
 
-            add(product4);
-        }};
-        given(productRepository.findAll()).willReturn(expectedList);
-        List<ProductDTO> answer = productService.findAll();
-
-        if (answer.size() != expectedList.size())
+        if (answer.size() != all.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            assertEquals(dto(expectedList.get(i)), answer.get(i));
+            assertEquals(all.get(i), answer.get(i));
 
         verify(productRepository, Mockito.atLeastOnce()).findAll();
     }
 
     @Test
     void findByIds() throws EntityMissingException {
-        List<Product> expectedList = new ArrayList<>() {{
-            add(product1);
-            add(product2);
-        }};
-        List<Integer> ids = new ArrayList<>() {{
-            add(product1.getId());
-            add(product2.getId());
-        }};
-        given(productRepository.findAllById(ids)).willReturn(expectedList);
+        List<Integer> ids = all.stream().map(Product::getId).collect(Collectors.toList());
+        given(productRepository.findAllById(ids)).willReturn(all);
         List<Product> answer = productService.findByIds(ids);
 
-        if (answer.size() != expectedList.size())
+        if (answer.size() != all.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            assertEquals(expectedList.get(i), answer.get(i));
+            assertEquals(all.get(i), answer.get(i));
 
         verify(productRepository, Mockito.atLeastOnce()).findAllById(ids);
     }
@@ -116,11 +94,11 @@ public class ProductServiceTest {
     void update() throws EntityMissingException {
         ProductCreateDTO newData = createDTO(product2);
         given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
-        ProductDTO updated = productService.update(product1.getId(), newData);
+        Product updated = productService.update(product1.getId(), newData);
 
         assertEquals(updated.getName(), newData.getName());
         assertEquals(updated.getPrice(), newData.getPrice());
-        assertEquals(updated.getOrdersIds(), newData.getOrdersIds());
+        assertEquals(updated.getOrders().stream().map(Customer::getId).collect(Collectors.toList()), newData.getOrdersIds());
         assertEquals(updated.getId(), product1.getId());
 
         verify(productRepository, Mockito.atLeastOnce()).findById(product1.getId());
@@ -134,6 +112,5 @@ public class ProductServiceTest {
         productService.delete(product1.getId());
         assertEquals(Optional.empty(), productService.findById(product1.getId()));
         verify(productRepository, Mockito.atLeastOnce()).deleteById(product1.getId());
-
     }
 }

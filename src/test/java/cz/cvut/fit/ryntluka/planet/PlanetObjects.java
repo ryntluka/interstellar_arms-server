@@ -1,5 +1,6 @@
 package cz.cvut.fit.ryntluka.planet;
 
+import cz.cvut.fit.ryntluka.dto.CustomerCreateDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetCreateDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
@@ -7,9 +8,10 @@ import cz.cvut.fit.ryntluka.entity.Planet;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 
 public class PlanetObjects {
     public static Planet planet1 = new Planet("Coruscant",
@@ -24,9 +26,20 @@ public class PlanetObjects {
             new Point(1234, 53), "Outer Rim", "Zabrak",
             new ArrayList<>()
     );
+    public static Planet planet3_inhabited = new Planet("Dathomir",
+            new Point(1234, 53), "Outer Rim", "Zabrak",
+            List.of(customer1)
+    );
     public static Planet planet4 = new Planet("Mandalore",
             new Point(1234, 53), "Outer Rim", "Human",
             new ArrayList<>()
+    );
+
+    public static java.util.List<Planet> all = List.of(
+            planet1,
+            planet2,
+            planet3,
+            planet4
     );
 
     /*================================================================================================================*/
@@ -54,5 +67,13 @@ public class PlanetObjects {
                         stream().
                         map(Customer::getId).
                         collect(Collectors.toList()));
+    }
+
+    public static String toCreateJSON(Planet planet) {
+        return "{ \"name\": \"" + planet.getName() + "\", "
+                + "\"coordinate\": {\"x\": " + planet.getCoordinate().getX() + ", \"y\": " + planet.getCoordinate().getY() + "}, "
+                + "\"territory\": \"" + planet.getTerritory() + "\", "
+                + "\"nativeRace\": \"" + planet.getNativeRace() + "\", "
+                + "\"inhabitants\": [] }";
     }
 }

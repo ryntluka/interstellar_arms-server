@@ -79,6 +79,7 @@ public class Product {
         return id == product.id
                 && Objects.equals(price, product.price)
                 && Objects.equals(name, product.name)
-                && Objects.equals(orders, product.orders);
+                && (Objects.equals(orders, product.orders)
+                    || orders.isEmpty() && product.orders == null);
     }
 }

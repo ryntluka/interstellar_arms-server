@@ -28,30 +28,23 @@ public class ProductService {
         this.customerService = customerService;
     }
 
-
     /*================================================================================================================*/
 
     @Transactional
-    public ProductDTO create(ProductCreateDTO productCreateDTO) throws EntityMissingException {
+    public Product create(ProductCreateDTO productCreateDTO) throws EntityMissingException {
 
         List<Customer> customers = customerService.findByIds(productCreateDTO.getOrdersIds());
         if (customers.size() != productCreateDTO.getOrdersIds().size())
             throw new EntityMissingException();
-        return toDTO(
-                productRepository.save(
-                        new Product(productCreateDTO.getPrice(), productCreateDTO.getName(), customers)
-                )
+        return productRepository.save(
+                new Product(productCreateDTO.getPrice(), productCreateDTO.getName(), customers)
         );
     }
 
     /*================================================================================================================*/
 
-    public List<ProductDTO> findAll() {
-        return productRepository
-                .findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<Product> findAll() {
+        return productRepository.findAll();
     }
 
     public List<Product> findByIds(List<Integer> ids) {
@@ -62,18 +55,14 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public Optional<ProductDTO> findByIdAsDTO(int id) {
-        return toDTO(productRepository.findById(id));
-    }
-
-    public Optional<ProductDTO> findByName (String name) {
-        return toDTO(productRepository.findByName(name));
+    public Optional<Product> findByName (String name) {
+        return productRepository.findByName(name);
     }
 
     /*================================================================================================================*/
 
     @Transactional
-    public ProductDTO update(int id, ProductCreateDTO productCreateDTO) throws EntityMissingException {
+    public Product update(int id, ProductCreateDTO productCreateDTO) throws EntityMissingException {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isEmpty())
             throw new EntityMissingException(id);
@@ -86,7 +75,7 @@ public class ProductService {
         product.setPrice(productCreateDTO.getPrice());
         product.setName(productCreateDTO.getName());
         product.setOrders(customers);
-        return toDTO(product);
+        return product;
     }
 
     /*================================================================================================================*/
@@ -94,25 +83,5 @@ public class ProductService {
     @Transactional
     public void delete(int id) {
         productRepository.deleteById(id);
-    }
-
-    /*================================================================================================================*/
-
-    private ProductDTO toDTO(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getPrice(),
-                product.getName(),
-                product.getOrders().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
-    }
-
-    private Optional<ProductDTO> toDTO(Optional<Product> product) {
-
-        if (product.isEmpty())
-            return Optional.empty();
-        return Optional.of(toDTO(product.get()));
     }
 }

@@ -1,0 +1,8 @@
+DELETE http://localhost:8080/api/customers/5
+Content-Type: application/vnd-customers+json
+
+###
+
+OPTIONS http://localhost:8080/api/customers
+
+###

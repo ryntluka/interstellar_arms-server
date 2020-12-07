@@ -1,0 +1,54 @@
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+{
+  "firstName": "Lukas",
+  "lastName": "Rynt",
+  "email": "ryntluka@fit.cvut.cz"
+}
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+{
+  "firstName": "Anakin",
+  "lastName": "Skywalker",
+  "email": "ani.sky@sw.com"
+}
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+{
+  "firstName": "Ahsoka",
+  "lastName": "Tano",
+  "email": "ahso.tano@sw.com"
+}
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+{
+  "firstName": "Darth",
+  "lastName": "Maul",
+  "email": "d.maul@sw.com"
+}
+
+###
+
+POST http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+{
+  "firstName": "Din",
+  "lastName": "Djarin",
+  "email": "din.mandalorian@sw.com"
+}
+
+###

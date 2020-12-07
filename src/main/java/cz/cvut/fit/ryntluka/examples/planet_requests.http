@@ -2,31 +2,39 @@ GET http://localhost:8080/api/planets/1
 
 ###
 
-GET http://localhost:8080/api/planets
+GET http://localhost:8080/api/planets/20
+Content-Type: application/vnd-planets+json
 
 ###
 
-GET http://localhost:8080/api/planets?Coruscant
+GET http://localhost:8080/api/planets?name=Coruscant
+Content-Type: application/vnd-planets+json
 
 ###
 
 OPTIONS http://localhost:8080/api/planets
+Content-Type: application/vnd-planets+json
 
 ###
 
 POST http://localhost:8080/api/planets
-Content-Type: application/json
+Content-Type: application/vnd-planets+json
 
 {
   "name": "Coruscant",
   "coordinate": {"x":  10, "y":  20},
   "territory": "Core Worlds",
   "nativeRace": "Human",
-  "inhabitantsIds": [6, 7]
+  "inhabitantsIds": []
 }
 
 ###
 
 DELETE http://localhost:8080/api/planets/1
+Content-Type: application/vnd-planets+json
 
 ###
+
+###
+PUT http://localhost:8080/api/planets/add/20
+Content-Type: application/vnd-planets+json

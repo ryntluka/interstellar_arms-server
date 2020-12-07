@@ -29,31 +29,24 @@ public class PlanetService {
     /*================================================================================================================*/
 
     @Transactional
-    public PlanetDTO create(PlanetCreateDTO planetCreateDTO) throws EntityMissingException {
+    public Planet create(PlanetCreateDTO planetCreateDTO) throws EntityMissingException {
         List<Customer> inhabitants = customerService.findByIds(planetCreateDTO.getInhabitantsIds());
         if (inhabitants.size() != planetCreateDTO.getInhabitantsIds().size())
             throw new EntityMissingException();
 
-        return toDTO(
-                planetRepository.save(
-                        new Planet(
-                                planetCreateDTO.getName(),
-                                planetCreateDTO.getCoordinate(),
-                                planetCreateDTO.getTerritory(),
-                                planetCreateDTO.getNativeRace(),
-                                inhabitants)
-                )
+        return planetRepository.save(
+                new Planet(planetCreateDTO.getName(),
+                        planetCreateDTO.getCoordinate(),
+                        planetCreateDTO.getTerritory(),
+                        planetCreateDTO.getNativeRace(),
+                        inhabitants)
         );
     }
 
     /*================================================================================================================*/
 
-    public List<PlanetDTO> findAll() {
-        return planetRepository
-                .findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<Planet> findAll() {
+        return planetRepository.findAll();
     }
 
     public List<Planet> findByIds(List<Integer> ids) {
@@ -64,18 +57,14 @@ public class PlanetService {
         return planetRepository.findById(id);
     }
 
-    public Optional<PlanetDTO> findByIdAsDTO(int id) {
-        return toDTO(planetRepository.findById(id));
-    }
-
-    public Optional<PlanetDTO> findByName (String name) {
-        return toDTO(planetRepository.findByName(name));
+    public Optional<Planet> findByName (String name) {
+        return planetRepository.findByName(name);
     }
 
     /*================================================================================================================*/
 
     @Transactional
-    public PlanetDTO update(int id, PlanetCreateDTO planetCreateDTO) throws EntityMissingException {
+    public Planet update(int id, PlanetCreateDTO planetCreateDTO) throws EntityMissingException {
         Optional<Planet> optionalPlanet = planetRepository.findById(id);
         if (optionalPlanet.isEmpty())
             throw new EntityMissingException(id);
@@ -91,7 +80,7 @@ public class PlanetService {
         planet.setTerritory(planetCreateDTO.getTerritory());
         planet.setNativeRace(planetCreateDTO.getNativeRace());
         planet.setInhabitants(inhabitants);
-        return toDTO(planet);
+        return planet;
     }
 
     /*================================================================================================================*/
@@ -104,7 +93,7 @@ public class PlanetService {
     /*================================================================================================================*/
 
     @Transactional
-    public PlanetDTO customerAddResidence(int customerId, int planetId) throws EntityMissingException {
+    public Planet customerAddResidence(int customerId, int planetId) throws EntityMissingException {
         Optional<Customer> optionalCustomer = customerService.findById(customerId);
         if(optionalCustomer.isEmpty())
             throw new EntityMissingException(customerId);
@@ -115,25 +104,6 @@ public class PlanetService {
 
         Planet planet = optionalPlanet.get();
         planet.getInhabitants().add(optionalCustomer.get());
-        return toDTO(planet);
-    }
-
-    private PlanetDTO toDTO(Planet planet) {
-        return new PlanetDTO(
-                planet.getId(),
-                planet.getName(),
-                planet.getCoordinate(),
-                planet.getTerritory(),
-                planet.getNativeRace(),
-                planet.getInhabitants().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
-    }
-
-    private Optional<PlanetDTO> toDTO(Optional<Planet> planet) {
-        if (planet.isEmpty())
-            return Optional.empty();
-        return Optional.of(toDTO(planet.get()));
+        return planet;
     }
 }

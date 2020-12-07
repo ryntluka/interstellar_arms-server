@@ -1,0 +1,14 @@
+GET http://localhost:8080/api/customers/1
+Content-Type: application/vnd-customers+json
+
+###
+
+GET http://localhost:8080/api/customers
+Content-Type: application/vnd-customers+json
+
+###
+
+GET http://localhost:8080/api/customers?name=Skywalker
+Content-Type: application/vnd-customers+json
+
+###

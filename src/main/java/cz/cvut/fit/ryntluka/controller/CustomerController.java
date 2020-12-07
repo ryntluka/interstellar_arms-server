@@ -3,15 +3,10 @@ package cz.cvut.fit.ryntluka.controller;
 import cz.cvut.fit.ryntluka.dto.CustomerCreateDTO;
 import cz.cvut.fit.ryntluka.dto.CustomerDTO;
 import cz.cvut.fit.ryntluka.dto.CustomerDTOAssembler;
-import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/api/customers", produces = "application/vnd-characters+json", consumes = "application/vnd-characters+json")
+@RequestMapping(value = "/api/customers", produces = "application/vnd-customers+json", consumes = "application/vnd-customers+json")
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -47,8 +42,9 @@ public class CustomerController {
 
     @GetMapping(params = {"name"})
     public CustomerDTO findByName(@RequestParam String name) {
-        Customer customer = customerService.findByLastName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return customerDTOAssembler.toModel(customer);
+        return customerDTOAssembler.toModel(
+                customerService.findByLastName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+        );
     }
 
     @PostMapping

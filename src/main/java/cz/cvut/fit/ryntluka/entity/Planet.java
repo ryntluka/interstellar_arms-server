@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +38,7 @@ public class Planet {
         this.territory = territory;
         this.nativeRace = nativeRace;
         this.inhabitants = inhabitants;
+
     }
 
     public int getId() {
@@ -100,6 +102,7 @@ public class Planet {
                 && Objects.equals(coordinate, planet.coordinate)
                 && Objects.equals(territory, planet.territory)
                 && Objects.equals(nativeRace, planet.nativeRace)
-                && Objects.equals(inhabitants, planet.inhabitants);
+                && (Objects.equals(inhabitants, planet.inhabitants)
+                    || inhabitants.isEmpty() && planet.inhabitants == null);
     }
 }

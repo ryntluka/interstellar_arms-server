@@ -2,6 +2,7 @@ package cz.cvut.fit.ryntluka.dto;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class PlanetCreateDTO {
 
@@ -37,5 +38,25 @@ public class PlanetCreateDTO {
 
     public List<Integer> getInhabitantsIds() {
         return inhabitantsIds;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, coordinate, territory, nativeRace, inhabitantsIds);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        PlanetCreateDTO planet = (PlanetCreateDTO) obj;
+        return Objects.equals(name, planet.name)
+                && Objects.equals(coordinate, planet.coordinate)
+                && Objects.equals(territory, planet.territory)
+                && Objects.equals(nativeRace, planet.nativeRace)
+                && (Objects.equals(inhabitantsIds, planet.inhabitantsIds)
+                || inhabitantsIds.isEmpty() && planet.inhabitantsIds == null);
     }
 }

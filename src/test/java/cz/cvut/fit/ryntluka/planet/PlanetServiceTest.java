@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.planet.PlanetObjects.all;
 import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 import static cz.cvut.fit.ryntluka.planet.PlanetObjects.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +47,7 @@ public class PlanetServiceTest {
     @Test
     void create() throws EntityMissingException {
         given(planetRepository.save(planet1)).willReturn(planet1);
-        assertEquals(dto(planet1), planetService.create(createDTO(planet1)));
+        assertEquals(planet1, planetService.create(createDTO(planet1)));
     }
 
     /*================================================================================================================*/
@@ -61,56 +62,34 @@ public class PlanetServiceTest {
     @Test
     void findByName() throws EntityMissingException {
         given(planetRepository.findByName(planet1.getName())).willReturn(Optional.of(planet1));
-        PlanetDTO planetDTO = dto(planet1);
-        PlanetDTO res = planetService.findByName(planet1.getName()).orElseThrow(EntityMissingException::new);
-        assertEquals(planetDTO, res);
+        Planet res = planetService.findByName(planet1.getName()).orElseThrow(EntityMissingException::new);
+        assertEquals(planet1, res);
         verify(planetRepository, atLeastOnce()).findByName(planet1.getName());
     }
 
     @Test
-    void findByIdAsDTO() throws EntityMissingException {
-        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
-        PlanetDTO res = planetService.findByIdAsDTO(planet1.getId()).orElseThrow(EntityMissingException::new);
-        assertEquals(res, dto(planet1));
-        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
-    }
-
-    @Test
     void findAll() throws EntityMissingException {
-        List<Planet> expectedList = new ArrayList<>() {{
-            add(planet1);
-            add(planet2);
-            add(planet3);
-            add(planet4);
-        }};
-        given(planetRepository.findAll()).willReturn(expectedList);
-        List<PlanetDTO> answer = planetService.findAll();
+        given(planetRepository.findAll()).willReturn(all);
+        List<Planet> answer = planetService.findAll();
 
-        if (answer.size() != expectedList.size())
+        if (answer.size() != all.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            assertEquals(dto(expectedList.get(i)), answer.get(i));
+            assertEquals(all.get(i), answer.get(i));
 
         verify(planetRepository, atLeastOnce()).findAll();
     }
 
     @Test
     void findByIds() throws EntityMissingException {
-        List<Planet> expectedList = new ArrayList<>() {{
-            add(planet1);
-            add(planet2);
-        }};
-        List<Integer> ids = new ArrayList<>() {{
-            add(planet1.getId());
-            add(planet2.getId());
-        }};
-        given(planetRepository.findAllById(ids)).willReturn(expectedList);
+        List<Integer> ids = all.stream().map(Planet::getId).collect(Collectors.toList());
+        given(planetRepository.findAllById(ids)).willReturn(all);
         List<Planet> answer = planetService.findByIds(ids);
 
-        if (answer.size() != expectedList.size())
+        if (answer.size() != all.size())
             throw new EntityMissingException();
         for (int i = 0; i < answer.size(); ++i)
-            assertEquals(expectedList.get(i), answer.get(i));
+            assertEquals(all.get(i), answer.get(i));
 
         verify(planetRepository, atLeastOnce()).findAllById(ids);
     }
@@ -121,13 +100,13 @@ public class PlanetServiceTest {
     void update() throws EntityMissingException {
         PlanetCreateDTO newData = createDTO(planet2);
         given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
-        PlanetDTO updated = planetService.update(planet1.getId(), newData);
+        Planet updated = planetService.update(planet1.getId(), newData);
 
         assertEquals(updated.getName(), newData.getName());
         assertEquals(updated.getCoordinate(), newData.getCoordinate());
         assertEquals(updated.getTerritory(), newData.getTerritory());
         assertEquals(updated.getNativeRace(), newData.getNativeRace());
-        assertEquals(updated.getInhabitantsIds(), newData.getInhabitantsIds());
+        assertEquals(updated.getInhabitants().stream().map(Customer::getId).collect(Collectors.toList()), newData.getInhabitantsIds());
         assertEquals(updated.getId(), planet1.getId());
 
         verify(planetRepository, atLeastOnce()).findById(planet1.getId());
@@ -153,14 +132,13 @@ public class PlanetServiceTest {
 
         List<Customer> expectedList = planet1.getInhabitants();
         expectedList.add(customer1);
-        PlanetDTO updated = planetService.customerAddResidence(customer1.getId(), planet1.getId());
-        PlanetDTO expected = dto(planet1);
-        assertEquals(expected.getCoordinate(), updated.getCoordinate());
-        assertEquals(expected.getId(), updated.getId());
-        assertEquals(expected.getName(), updated.getName());
-        assertEquals(expected.getNativeRace(), updated.getNativeRace());
-        assertEquals(expected.getTerritory(), updated.getTerritory());
-        assertEquals(expectedList.stream().map(Customer::getId).collect(Collectors.toList()), updated.getInhabitantsIds());
+        Planet updated = planetService.customerAddResidence(customer1.getId(), planet1.getId());
+        assertEquals(planet1.getCoordinate(), updated.getCoordinate());
+        assertEquals(planet1.getId(), updated.getId());
+        assertEquals(planet1.getName(), updated.getName());
+        assertEquals(planet1.getNativeRace(), updated.getNativeRace());
+        assertEquals(planet1.getTerritory(), updated.getTerritory());
+        assertEquals(expectedList, updated.getInhabitants());
 
         verify(planetRepository, atLeastOnce()).findById(planet1.getId());
         verify(customerRepository, atLeastOnce()).findById(customer1.getId());

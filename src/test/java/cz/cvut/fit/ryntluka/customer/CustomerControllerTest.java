@@ -1,31 +1,23 @@
 package cz.cvut.fit.ryntluka.customer;
 
-import cz.cvut.fit.ryntluka.dto.CustomerCreateDTO;
-import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
 import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
-import static net.minidev.json.JSONValue.toJSONString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.data.domain.Pageable;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,7 +25,7 @@ public class CustomerControllerTest {
 
     private final static String ROOT_URL = "/api/customers";
     private final static String GET_ONE = "/{id}";
-    private final static String CONTENT_TYPE = "application/vnd-characters+json";
+    private final static String CONTENT_TYPE = "application/vnd-customers+json";
 
 
     @Autowired
@@ -41,7 +33,6 @@ public class CustomerControllerTest {
 
     @MockBean
     private CustomerService customerService;
-
 
     @Test
     void findById() throws Exception {
@@ -64,6 +55,26 @@ public class CustomerControllerTest {
     }
 
     @Test
+    void findByName() throws Exception {
+        given(customerService.findByLastName(customer1.getLastName())).willReturn(Optional.of(customer1));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        get(ROOT_URL + "?name=" + customer1.getLastName()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(customer1.getId()))).
+                andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
+                andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
+                andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+
+        verify(customerService, atLeastOnce()).findByLastName(customer1.getLastName());
+    }
+
+    @Test
     void findAll() throws Exception {
         given(customerService.findAll()).willReturn(all);
 
@@ -79,15 +90,54 @@ public class CustomerControllerTest {
 
     @Test
     void create() throws Exception {
-        Customer customer = new Customer("Lukáš", "Rynt", "ryntluka@fit.cvut.cz");
-        given(customerService.create(createDTO(customer))).willReturn(customer);
+        given(customerService.create(createDTO(customer1))).willReturn(customer1);
         mockMvc.perform(
                 MockMvcRequestBuilders.
                         post(ROOT_URL).
                         contentType(CONTENT_TYPE).
                         accept(CONTENT_TYPE).
-                        content(" { \"firstName\": \"Lukáš\", \"lastName\": \"Rynt\", \"email\": \"ryntluka@fit.cvut.cz\" } ")).
-                andExpect(status().isCreated());
-        verify(customerService, atLeastOnce()).create(createDTO(customer));
+                        content(toCreateJSON(customer1))).
+                andExpect(status().isCreated()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(customer1.getId()))).
+                andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
+                andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
+                andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+        verify(customerService, atLeastOnce()).create(createDTO(customer1));
+    }
+
+    @Test
+    void update() throws Exception {
+
+        given(customerService.update(customer1.getId(), createDTO(customer2))).willReturn(customer2);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        put(ROOT_URL + GET_ONE, customer1.getId()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE).
+                        content(toCreateJSON(customer2))).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(customer1.getId()))).
+                andExpect(jsonPath("$.firstName", CoreMatchers.is(customer2.getFirstName()))).
+                andExpect(jsonPath("$.lastName", CoreMatchers.is(customer2.getLastName()))).
+                andExpect(jsonPath("$.email", CoreMatchers.is(customer2.getEmail()))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+
+        verify(customerService, atLeastOnce()).update(customer1.getId(), createDTO(customer2));
+    }
+
+    @Test
+    void delete() throws Exception {
+        customerService.delete(customer1.getId());
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        delete(ROOT_URL + GET_ONE, customer1.getId()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk());
+        verify(customerService, Mockito.atLeastOnce()).delete(customer1.getId());
     }
 }

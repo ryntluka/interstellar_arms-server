@@ -15,14 +15,45 @@ OPTIONS http://localhost:8080/api/products
 ###
 
 POST http://localhost:8080/api/products
-Content-Type: application/json
+Content-Type: application/vnd-products+json
 
 {
-  "name": "Coruscant",
-  "coordinate": {"x":  10, "y":  20},
-  "territory": "Core Worlds",
-  "nativeRace": "Human",
-  "inhabitants": []
+  "name": "DL-44 heavy blaster pistol",
+  "price": 12,
+  "orders": []
+}
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/vnd-products+json
+
+{
+  "name": "X-Wing",
+  "price": 31589,
+  "orders": []
+}
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/vnd-products+json
+
+{
+  "name": "AAT",
+  "price": 46,
+  "orders": []
+}
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/vnd-products+json
+
+{
+  "name": "Death Star",
+  "price": 544932187,
+  "orders": []
 }
 
 ###
