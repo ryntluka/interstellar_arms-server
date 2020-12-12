@@ -42,10 +42,8 @@ public class ProductController {
     }
 
     @GetMapping(params = {"name"})
-    public ProductDTO findByName(@RequestParam String name) {
-        return productDTOAssembler.toModel(
-                productService.findByName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-        );
+    public List<ProductDTO> findByName(@RequestParam String name) {
+        return productService.findAllByName(name).stream().map(productDTOAssembler::toModel).collect(Collectors.toList());
     }
 
     @PostMapping

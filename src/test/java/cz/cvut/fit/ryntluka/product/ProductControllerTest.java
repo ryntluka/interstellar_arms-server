@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -61,8 +62,8 @@ public class ProductControllerTest {
     }
 
     @Test
-    void findByName() throws Exception {
-        given(productService.findByName(product1.getName())).willReturn(Optional.of(product1));
+    void findAllByName() throws Exception {
+        given(productService.findAllByName(product1.getName())).willReturn(List.of(product1));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.
@@ -70,14 +71,14 @@ public class ProductControllerTest {
                         accept(CONTENT_TYPE).
                         contentType(CONTENT_TYPE)).
                 andExpect(status().isOk()).
-                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
-                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
-                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
-                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
-                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
-                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+                andExpect(jsonPath("$.[0].id", CoreMatchers.is(product1.getId()))).
+                andExpect(jsonPath("$.[0].name", CoreMatchers.is(product1.getName()))).
+                andExpect(jsonPath("$.[0].price", CoreMatchers.is(product1.getPrice()))).
+                andExpect(jsonPath("$.[0].ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.[0].links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.[0].links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 
-        verify(productService, atLeastOnce()).findByName(product1.getName());
+        verify(productService, atLeastOnce()).findAllByName(product1.getName());
     }
 
     @Test

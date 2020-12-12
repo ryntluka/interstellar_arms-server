@@ -61,11 +61,11 @@ public class ProductServiceTest {
     }
 
     @Test
-    void findByName() throws EntityMissingException {
-        given(productRepository.findByName(product1.getName())).willReturn(Optional.of(product1));
-        Product res = productService.findByName(product1.getName()).orElseThrow(EntityMissingException::new);
-        assertEquals(product1, res);
-        verify(productRepository, atLeastOnce()).findByName(product1.getName());
+    void findAllByName() {
+        given(productRepository.findAllByName(product1.getName())).willReturn(List.of(product1));
+        List<Product> res = productService.findAllByName(product1.getName());
+        assertEquals(product1, res.get(0));
+        verify(productRepository, atLeastOnce()).findAllByName(product1.getName());
     }
 
     @Test
