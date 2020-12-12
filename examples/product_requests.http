@@ -66,3 +66,13 @@ DELETE http://localhost:8080/api/products/43
 Content-Type: application/vnd-products+json
 
 ###
+
+DELETE http://localhost:8080/api/products/41?customerId=30
+Content-Type: application/vnd-products+json
+
+###
+
+GET http://localhost:8080/api/products/41
+Content-Type: application/vnd-products+json
+
+###

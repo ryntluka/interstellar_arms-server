@@ -115,9 +115,11 @@ public class ProductServiceTest {
 
     @Test
     void delete() throws EntityMissingException, EntityContainsElementsException {
-        productRepository.deleteById(product1.getId());
+        given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
+
         productService.delete(product1.getId());
-        assertEquals(Optional.empty(), productService.findById(product1.getId()));
+
+        verify(productRepository, atLeastOnce()).findById(product1.getId());
         verify(productRepository, atLeastOnce()).deleteById(product1.getId());
     }
 
@@ -141,16 +143,16 @@ public class ProductServiceTest {
 
     @Test
     void removeOrder() throws EntityMissingException {
-        given(productRepository.findById(product1_ordered.getId())).willReturn(Optional.of(product1_ordered));
+        given(productRepository.findById(product3_ordered.getId())).willReturn(Optional.of(product3_ordered));
         given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
 
-        List<Customer> expectedList = product1.getOrders();
-        Product updated = productService.removeOrder(customer1.getId(), product1_ordered.getId());
-        assertEquals(product1.getId(), updated.getId());
-        assertEquals(product1.getName(), updated.getName());
+        List<Customer> expectedList = product3.getOrders();
+        Product updated = productService.removeOrder(customer1.getId(), product3_ordered.getId());
+        assertEquals(product3.getId(), updated.getId());
+        assertEquals(product3.getName(), updated.getName());
         assertEquals(expectedList, updated.getOrders());
 
-        verify(productRepository, atLeastOnce()).findById(product1_ordered.getId());
+        verify(productRepository, atLeastOnce()).findById(product3_ordered.getId());
         verify(customerRepository, atLeastOnce()).findById(customer1.getId());
     }
 }

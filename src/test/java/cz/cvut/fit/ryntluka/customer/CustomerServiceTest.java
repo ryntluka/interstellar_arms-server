@@ -115,9 +115,12 @@ public class CustomerServiceTest {
 
     @Test
     void delete() throws EntityMissingException {
-        customerRepository.deleteById(customer1.getId());
+        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
+
+
         customerService.delete(customer1.getId());
-        assertEquals(Optional.empty(), customerService.findById(customer1.getId()));
+
+        verify(customerRepository, Mockito.atLeastOnce()).findById(customer1.getId());
         verify(customerRepository, Mockito.atLeastOnce()).deleteById(customer1.getId());
 
     }

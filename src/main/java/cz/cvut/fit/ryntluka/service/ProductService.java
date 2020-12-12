@@ -91,6 +91,7 @@ public class ProductService {
         return product;
     }
 
+    @Transactional
     public Product removeOrder(int customerId, int productId) throws EntityMissingException {
         Product product = productRepository.findById(productId).orElseThrow(EntityMissingException::new);
         Customer customer = customerService.findById(customerId).orElseThrow(EntityMissingException::new);
@@ -98,7 +99,13 @@ public class ProductService {
             throw new EntityMissingException();
 
         List<Customer> orders = new ArrayList<>(product.getOrders());
-        orders.removeIf(curr -> curr == customer);
+        Iterator<Customer> itr = orders.listIterator();
+        while (itr.hasNext()) {
+            if (itr.next().getId() == customerId) {
+                itr.remove();
+                break;
+            }
+        }
         product.setOrders(orders);
         return product;
     }

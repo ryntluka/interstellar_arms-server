@@ -154,42 +154,42 @@ public class ProductControllerTest {
     @Test
     void order() throws Exception {
 
-        given(productService.order(customer1.getId(), product1.getId())).willReturn(product1_ordered);
+        given(productService.order(customer1.getId(), product3.getId())).willReturn(product3_ordered);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.
-                        put(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product1.getId()).
+                        put(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product3.getId()).
                         accept(CONTENT_TYPE).
                         contentType(CONTENT_TYPE)).
                 andExpect(status().isOk()).
-                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
-                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
-                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
-                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1_ordered.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
-                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.id", CoreMatchers.is(product3.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(product3.getName()))).
+                andExpect(jsonPath("$.price", CoreMatchers.is(product3.getPrice()))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product3_ordered.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product3.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 
-        verify(productService, atLeastOnce()).order(customer1.getId(), product1.getId());
+        verify(productService, atLeastOnce()).order(customer1.getId(), product3.getId());
     }
 
     @Test
     void removeOrder() throws Exception {
 
-        given(productService.removeOrder(customer1.getId(), product1_ordered.getId())).willReturn(product1);
+        given(productService.removeOrder(customer1.getId(), product3_ordered.getId())).willReturn(product3);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.
-                        delete(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product1.getId()).
+                        delete(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product3.getId()).
                         accept(CONTENT_TYPE).
                         contentType(CONTENT_TYPE)).
                 andExpect(status().isOk()).
-                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
-                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
-                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
-                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
-                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.id", CoreMatchers.is(product3.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(product3.getName()))).
+                andExpect(jsonPath("$.price", CoreMatchers.is(product3.getPrice()))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product3.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product3.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 
-        verify(productService, atLeastOnce()).removeOrder(customer1.getId(), product1.getId());
+        verify(productService, atLeastOnce()).removeOrder(customer1.getId(), product3.getId());
     }
 }

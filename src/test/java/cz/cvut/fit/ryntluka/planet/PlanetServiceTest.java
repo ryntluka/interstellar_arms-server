@@ -116,10 +116,11 @@ public class PlanetServiceTest {
 
     @Test
     void delete() throws EntityMissingException, EntityContainsElementsException {
-        planetRepository.deleteById(planet1.getId());
-        planetService.delete(planet1.getId());
-        assertEquals(Optional.empty(), planetService.findById(planet1.getId()));
-        verify(planetRepository, atLeastOnce()).deleteById(planet1.getId());
+        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
 
+        planetService.delete(planet1.getId());
+
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
+        verify(planetRepository, atLeastOnce()).deleteById(planet1.getId());
     }
 }
