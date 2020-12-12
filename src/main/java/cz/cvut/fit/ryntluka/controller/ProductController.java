@@ -3,6 +3,7 @@ package cz.cvut.fit.ryntluka.controller;
 import cz.cvut.fit.ryntluka.dto.ProductCreateDTO;
 import cz.cvut.fit.ryntluka.dto.ProductDTO;
 import cz.cvut.fit.ryntluka.dto.ProductDTOAssembler;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,37 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
-        productService.delete(id);
+        try {
+            productService.delete(id);
+        } catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        } catch (EntityContainsElementsException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+    }
+
+    @PutMapping(value = {"/{id}"}, params = {"customerId"})
+    public ProductDTO order(@PathVariable int id, @RequestParam int customerId) {
+        try {
+            return productDTOAssembler.toModel(
+                    productService.order(customerId, id)
+            );
+        }
+        catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping(value = {"/{id}"}, params = {"customerId"})
+    public ProductDTO removeOrder(@PathVariable int id, @RequestParam int customerId) {
+        try {
+            return productDTOAssembler.toModel(
+                    productService.removeOrder(customerId, id)
+            );
+        }
+        catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 }
 

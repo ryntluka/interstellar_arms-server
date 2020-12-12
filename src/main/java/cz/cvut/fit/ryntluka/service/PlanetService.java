@@ -4,6 +4,7 @@ import cz.cvut.fit.ryntluka.dto.PlanetCreateDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.entity.Planet;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.repository.PlanetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,11 @@ public class PlanetService {
 
     @Transactional
     public Planet create(PlanetCreateDTO planetCreateDTO) throws EntityMissingException {
-        List<Customer> inhabitants = customerService.findByIds(planetCreateDTO.getInhabitantsIds());
-        if (inhabitants.size() != planetCreateDTO.getInhabitantsIds().size())
-            throw new EntityMissingException();
-
         return planetRepository.save(
                 new Planet(planetCreateDTO.getName(),
                         planetCreateDTO.getCoordinate(),
                         planetCreateDTO.getTerritory(),
-                        planetCreateDTO.getNativeRace(),
-                        inhabitants)
+                        planetCreateDTO.getNativeRace())
         );
     }
 
@@ -57,8 +53,8 @@ public class PlanetService {
         return planetRepository.findById(id);
     }
 
-    public Optional<Planet> findByName (String name) {
-        return planetRepository.findByName(name);
+    public List<Planet> findAllByName (String name) {
+        return planetRepository.findAllByName(name);
     }
 
     /*================================================================================================================*/
@@ -69,41 +65,27 @@ public class PlanetService {
         if (optionalPlanet.isEmpty())
             throw new EntityMissingException(id);
 
-
-        List<Customer> inhabitants = customerService.findByIds(planetCreateDTO.getInhabitantsIds());
-        if (inhabitants.size() != planetCreateDTO.getInhabitantsIds().size())
-            throw new EntityMissingException();
-
         Planet planet = optionalPlanet.get();
         planet.setName(planetCreateDTO.getName());
         planet.setCoordinate(planetCreateDTO.getCoordinate());
         planet.setTerritory(planetCreateDTO.getTerritory());
         planet.setNativeRace(planetCreateDTO.getNativeRace());
-        planet.setInhabitants(inhabitants);
         return planet;
     }
 
     /*================================================================================================================*/
 
     @Transactional
-    public void delete(int id) {
+    public void delete(int id) throws EntityContainsElementsException, EntityMissingException {
+        List<Integer> planetIds = customerService.findAll()
+                .stream()
+                .map(c -> c.getPlanet().getId())
+                .distinct()
+                .collect(Collectors.toList());
+        if (planetIds.contains(id))
+            throw new EntityContainsElementsException();
+        if (planetRepository.findById(id).isEmpty())
+            throw new EntityMissingException();
         planetRepository.deleteById(id);
-    }
-
-    /*================================================================================================================*/
-
-    @Transactional
-    public Planet customerAddResidence(int customerId, int planetId) throws EntityMissingException {
-        Optional<Customer> optionalCustomer = customerService.findById(customerId);
-        if(optionalCustomer.isEmpty())
-            throw new EntityMissingException(customerId);
-
-        Optional<Planet> optionalPlanet = planetRepository.findById(planetId);
-        if(optionalPlanet.isEmpty())
-            throw new EntityMissingException(planetId);
-
-        Planet planet = optionalPlanet.get();
-        planet.getInhabitants().add(optionalCustomer.get());
-        return planet;
     }
 }

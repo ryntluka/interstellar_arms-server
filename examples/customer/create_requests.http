@@ -4,7 +4,8 @@ Content-Type: application/vnd-customers+json
 {
   "firstName": "Lukas",
   "lastName": "Rynt",
-  "email": "ryntluka@fit.cvut.cz"
+  "email": "ryntluka@fit.cvut.cz",
+  "planetId": 23
 }
 
 ###
@@ -15,7 +16,8 @@ Content-Type: application/vnd-customers+json
 {
   "firstName": "Anakin",
   "lastName": "Skywalker",
-  "email": "ani.sky@sw.com"
+  "email": "ani.sky@sw.com",
+  "planetId": 23
 }
 
 ###
@@ -26,7 +28,8 @@ Content-Type: application/vnd-customers+json
 {
   "firstName": "Ahsoka",
   "lastName": "Tano",
-  "email": "ahso.tano@sw.com"
+  "email": "ahso.tano@sw.com",
+  "planetId": 23
 }
 
 ###
@@ -37,7 +40,8 @@ Content-Type: application/vnd-customers+json
 {
   "firstName": "Darth",
   "lastName": "Maul",
-  "email": "d.maul@sw.com"
+  "email": "d.maul@sw.com",
+  "planetId": 23
 }
 
 ###
@@ -48,7 +52,8 @@ Content-Type: application/vnd-customers+json
 {
   "firstName": "Din",
   "lastName": "Djarin",
-  "email": "din.mandalorian@sw.com"
+  "email": "din.mandalorian@sw.com",
+  "planetId": 23
 }
 
 ###

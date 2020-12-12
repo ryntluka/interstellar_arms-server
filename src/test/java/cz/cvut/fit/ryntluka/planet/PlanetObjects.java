@@ -15,24 +15,16 @@ import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 
 public class PlanetObjects {
     public static Planet planet1 = new Planet("Coruscant",
-            new Point(2341, 563), "Core Worlds", "Human",
-            new ArrayList<>()
+            new Point(2341, 563), "Core Worlds", "Human"
     );
     public static Planet planet2 = new Planet("Mon Cala",
-            new Point(1234, 53), "Outer Rim", "Mon Calamari",
-            new ArrayList<>()
+            new Point(1234, 53), "Outer Rim", "Mon Calamari"
     );
     public static Planet planet3 = new Planet("Dathomir",
-            new Point(1234, 53), "Outer Rim", "Zabrak",
-            new ArrayList<>()
-    );
-    public static Planet planet3_inhabited = new Planet("Dathomir",
-            new Point(1234, 53), "Outer Rim", "Zabrak",
-            List.of(customer1)
+            new Point(1234, 53), "Outer Rim", "Zabrak"
     );
     public static Planet planet4 = new Planet("Mandalore",
-            new Point(1234, 53), "Outer Rim", "Human",
-            new ArrayList<>()
+            new Point(1234, 53), "Outer Rim", "Human"
     );
 
     public static java.util.List<Planet> all = List.of(
@@ -49,11 +41,7 @@ public class PlanetObjects {
                 planet.getName(),
                 planet.getCoordinate(),
                 planet.getTerritory(),
-                planet.getNativeRace(),
-                planet.getInhabitants().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
+                planet.getNativeRace());
     }
 
     public static PlanetDTO dto(Planet planet) {
@@ -62,18 +50,13 @@ public class PlanetObjects {
                 planet.getName(),
                 planet.getCoordinate(),
                 planet.getTerritory(),
-                planet.getNativeRace(),
-                planet.getInhabitants().
-                        stream().
-                        map(Customer::getId).
-                        collect(Collectors.toList()));
+                planet.getNativeRace());
     }
 
     public static String toCreateJSON(Planet planet) {
         return "{ \"name\": \"" + planet.getName() + "\", "
                 + "\"coordinate\": {\"x\": " + planet.getCoordinate().getX() + ", \"y\": " + planet.getCoordinate().getY() + "}, "
                 + "\"territory\": \"" + planet.getTerritory() + "\", "
-                + "\"nativeRace\": \"" + planet.getNativeRace() + "\", "
-                + "\"inhabitants\": [] }";
+                + "\"nativeRace\": \"" + planet.getNativeRace() + "\" }";
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 import static cz.cvut.fit.ryntluka.product.ProductObjects.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
@@ -106,7 +107,11 @@ public class ProductControllerTest {
                 andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
                 andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
                 andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
-                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1
+                        .getOrders()
+                        .stream()
+                        .map(Customer::getId)
+                        .collect(Collectors.toList())))).
                 andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
         verify(productService, atLeastOnce()).create(createDTO(product1));
@@ -144,5 +149,47 @@ public class ProductControllerTest {
                         contentType(CONTENT_TYPE)).
                 andExpect(status().isOk());
         verify(productService, Mockito.atLeastOnce()).delete(product1.getId());
+    }
+
+    @Test
+    void order() throws Exception {
+
+        given(productService.order(customer1.getId(), product1.getId())).willReturn(product1_ordered);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        put(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product1.getId()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
+                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1_ordered.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+
+        verify(productService, atLeastOnce()).order(customer1.getId(), product1.getId());
+    }
+
+    @Test
+    void removeOrder() throws Exception {
+
+        given(productService.removeOrder(customer1.getId(), product1_ordered.getId())).willReturn(product1);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.
+                        delete(ROOT_URL + GET_ONE + "?customerId=" + customer1.getId(), product1.getId()).
+                        accept(CONTENT_TYPE).
+                        contentType(CONTENT_TYPE)).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.id", CoreMatchers.is(product1.getId()))).
+                andExpect(jsonPath("$.name", CoreMatchers.is(product1.getName()))).
+                andExpect(jsonPath("$.price", CoreMatchers.is(product1.getPrice()))).
+                andExpect(jsonPath("$.ordersIds", CoreMatchers.is(product1.getOrders().stream().map(Customer::getId).collect(Collectors.toList())))).
+                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + product1.getId()))).
+                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+
+        verify(productService, atLeastOnce()).removeOrder(customer1.getId(), product1.getId());
     }
 }

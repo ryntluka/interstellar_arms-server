@@ -7,11 +7,13 @@ public class CustomerCreateDTO {
     private final String firstName;
     private final String lastName;
     private final String email;
+    private final int planetId;
 
-    public CustomerCreateDTO(String firstName, String lastName, String email) {
+    public CustomerCreateDTO(String firstName, String lastName, String email, int planetId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.planetId = planetId;
     }
 
     public String getFirstName() {
@@ -24,6 +26,10 @@ public class CustomerCreateDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public int getPlanetId() {
+        return planetId;
     }
 
     @Override
@@ -40,6 +46,7 @@ public class CustomerCreateDTO {
         CustomerCreateDTO customer = (CustomerCreateDTO) obj;
         return Objects.equals(firstName, customer.firstName)
                 && Objects.equals(lastName, customer.lastName)
-                && Objects.equals(email, customer.email);
+                && Objects.equals(email, customer.email)
+                && Objects.equals(planetId, customer.planetId);
     }
 }

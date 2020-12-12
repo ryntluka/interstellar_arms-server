@@ -4,7 +4,9 @@ import cz.cvut.fit.ryntluka.dto.ProductCreateDTO;
 import cz.cvut.fit.ryntluka.dto.ProductDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.entity.Product;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
+import cz.cvut.fit.ryntluka.repository.CustomerRepository;
 import cz.cvut.fit.ryntluka.repository.ProductRepository;
 import cz.cvut.fit.ryntluka.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -18,10 +20,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
 import static cz.cvut.fit.ryntluka.product.ProductObjects.all;
 import static cz.cvut.fit.ryntluka.product.ProductObjects.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
@@ -30,6 +34,9 @@ public class ProductServiceTest {
 
     @MockBean
     private ProductRepository productRepository;
+
+    @MockBean
+    private CustomerRepository customerRepository;
 
     @Autowired
     public ProductServiceTest(ProductService productService) {
@@ -50,7 +57,7 @@ public class ProductServiceTest {
     void findById() {
         given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
         assertEquals(Optional.of(product1), productService.findById(product1.getId()));
-        verify(productRepository, Mockito.atLeastOnce()).findById(product1.getId());
+        verify(productRepository, atLeastOnce()).findById(product1.getId());
     }
 
     @Test
@@ -58,7 +65,7 @@ public class ProductServiceTest {
         given(productRepository.findByName(product1.getName())).willReturn(Optional.of(product1));
         Product res = productService.findByName(product1.getName()).orElseThrow(EntityMissingException::new);
         assertEquals(product1, res);
-        verify(productRepository, Mockito.atLeastOnce()).findByName(product1.getName());
+        verify(productRepository, atLeastOnce()).findByName(product1.getName());
     }
 
     @Test
@@ -71,7 +78,7 @@ public class ProductServiceTest {
         for (int i = 0; i < answer.size(); ++i)
             assertEquals(all.get(i), answer.get(i));
 
-        verify(productRepository, Mockito.atLeastOnce()).findAll();
+        verify(productRepository, atLeastOnce()).findAll();
     }
 
     @Test
@@ -85,7 +92,7 @@ public class ProductServiceTest {
         for (int i = 0; i < answer.size(); ++i)
             assertEquals(all.get(i), answer.get(i));
 
-        verify(productRepository, Mockito.atLeastOnce()).findAllById(ids);
+        verify(productRepository, atLeastOnce()).findAllById(ids);
     }
 
     /*================================================================================================================*/
@@ -101,16 +108,49 @@ public class ProductServiceTest {
         assertEquals(updated.getOrders().stream().map(Customer::getId).collect(Collectors.toList()), newData.getOrdersIds());
         assertEquals(updated.getId(), product1.getId());
 
-        verify(productRepository, Mockito.atLeastOnce()).findById(product1.getId());
+        verify(productRepository, atLeastOnce()).findById(product1.getId());
     }
 
     /*================================================================================================================*/
 
     @Test
-    void delete() {
+    void delete() throws EntityMissingException, EntityContainsElementsException {
         productRepository.deleteById(product1.getId());
         productService.delete(product1.getId());
         assertEquals(Optional.empty(), productService.findById(product1.getId()));
-        verify(productRepository, Mockito.atLeastOnce()).deleteById(product1.getId());
+        verify(productRepository, atLeastOnce()).deleteById(product1.getId());
+    }
+
+    /*================================================================================================================*/
+
+    @Test
+    void order() throws EntityMissingException {
+        given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
+        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
+
+        List<Customer> expectedList = product1.getOrders();
+        expectedList.add(customer1);
+        Product updated = productService.order(customer1.getId(), product1.getId());
+        assertEquals(product1.getId(), updated.getId());
+        assertEquals(product1.getName(), updated.getName());
+        assertEquals(expectedList, updated.getOrders());
+
+        verify(productRepository, atLeastOnce()).findById(product1.getId());
+        verify(customerRepository, atLeastOnce()).findById(customer1.getId());
+    }
+
+    @Test
+    void removeOrder() throws EntityMissingException {
+        given(productRepository.findById(product1_ordered.getId())).willReturn(Optional.of(product1_ordered));
+        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
+
+        List<Customer> expectedList = product1.getOrders();
+        Product updated = productService.removeOrder(customer1.getId(), product1_ordered.getId());
+        assertEquals(product1.getId(), updated.getId());
+        assertEquals(product1.getName(), updated.getName());
+        assertEquals(expectedList, updated.getOrders());
+
+        verify(productRepository, atLeastOnce()).findById(product1_ordered.getId());
+        verify(customerRepository, atLeastOnce()).findById(customer1.getId());
     }
 }

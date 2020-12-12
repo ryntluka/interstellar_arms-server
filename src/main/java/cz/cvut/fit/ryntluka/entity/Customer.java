@@ -2,9 +2,7 @@ package cz.cvut.fit.ryntluka.entity;
 
 import com.sun.istack.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -22,13 +20,18 @@ public class Customer {
 
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name="planet_id")
+    private Planet planet;
+
     public Customer() {
     }
 
-    public Customer(String firstName, String lastName, String email) {
+    public Customer(String firstName, String lastName, String email, Planet planet) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.planet = planet;
     }
 
     public int getId() {
@@ -59,9 +62,17 @@ public class Customer {
         this.email = email;
     }
 
+    public Planet getPlanet() {
+        return planet;
+    }
+
+    public void setPlanet(Planet planet) {
+        this.planet = planet;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email);
+        return Objects.hash(id, firstName, lastName, email, planet);
     }
 
     @Override
@@ -74,6 +85,7 @@ public class Customer {
         return id == customer.id
                 && Objects.equals(firstName, customer.firstName)
                 && Objects.equals(lastName, customer.lastName)
-                && Objects.equals(email, customer.email);
+                && Objects.equals(email, customer.email)
+                && Objects.equals(planet, customer.planet);
     }
 }

@@ -6,12 +6,15 @@ import cz.cvut.fit.ryntluka.dto.ProductDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.entity.Planet;
 import cz.cvut.fit.ryntluka.entity.Product;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -78,10 +81,34 @@ public class ProductService {
         return product;
     }
 
+
     /*================================================================================================================*/
 
     @Transactional
-    public void delete(int id) {
+    public Product order(int customerId, int productId) throws EntityMissingException {
+        Product product = productRepository.findById(productId).orElseThrow(EntityMissingException::new);
+        product.getOrders().add(customerService.findById(customerId).orElseThrow(EntityMissingException::new));
+        return product;
+    }
+
+    public Product removeOrder(int customerId, int productId) throws EntityMissingException {
+        Product product = productRepository.findById(productId).orElseThrow(EntityMissingException::new);
+        Customer customer = customerService.findById(customerId).orElseThrow(EntityMissingException::new);
+        if (!product.getOrders().contains(customer))
+            throw new EntityMissingException();
+
+        List<Customer> orders = new ArrayList<>(product.getOrders());
+        orders.removeIf(curr -> curr == customer);
+        product.setOrders(orders);
+        return product;
+    }
+
+    @Transactional
+    public void delete(int id) throws EntityMissingException, EntityContainsElementsException {
+        if (productRepository.findById(id).isEmpty())
+            throw new EntityMissingException();
+        if (!productRepository.findById(id).get().getOrders().isEmpty())
+            throw new EntityContainsElementsException();
         productRepository.deleteById(id);
     }
 }

@@ -1,8 +1,9 @@
-GET http://localhost:8080/api/planets/1
+GET http://localhost:8080/api/planets
+Content-Type: application/vnd-planets+json
 
 ###
 
-GET http://localhost:8080/api/planets/20
+GET http://localhost:8080/api/planets/22
 Content-Type: application/vnd-planets+json
 
 ###

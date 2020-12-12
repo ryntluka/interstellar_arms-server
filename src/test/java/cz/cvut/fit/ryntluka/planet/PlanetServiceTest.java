@@ -5,6 +5,7 @@ import cz.cvut.fit.ryntluka.dto.PlanetCreateDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.entity.Planet;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.repository.CustomerRepository;
 import cz.cvut.fit.ryntluka.repository.PlanetRepository;
@@ -61,10 +62,10 @@ public class PlanetServiceTest {
 
     @Test
     void findByName() throws EntityMissingException {
-        given(planetRepository.findByName(planet1.getName())).willReturn(Optional.of(planet1));
-        Planet res = planetService.findByName(planet1.getName()).orElseThrow(EntityMissingException::new);
-        assertEquals(planet1, res);
-        verify(planetRepository, atLeastOnce()).findByName(planet1.getName());
+        given(planetRepository.findAllByName(planet1.getName())).willReturn(List.of(planet1));
+        List<Planet> res = planetService.findAllByName(planet1.getName());
+        assertEquals(planet1, res.get(0));
+        verify(planetRepository, atLeastOnce()).findAllByName(planet1.getName());
     }
 
     @Test
@@ -106,7 +107,6 @@ public class PlanetServiceTest {
         assertEquals(updated.getCoordinate(), newData.getCoordinate());
         assertEquals(updated.getTerritory(), newData.getTerritory());
         assertEquals(updated.getNativeRace(), newData.getNativeRace());
-        assertEquals(updated.getInhabitants().stream().map(Customer::getId).collect(Collectors.toList()), newData.getInhabitantsIds());
         assertEquals(updated.getId(), planet1.getId());
 
         verify(planetRepository, atLeastOnce()).findById(planet1.getId());
@@ -115,32 +115,11 @@ public class PlanetServiceTest {
     /*================================================================================================================*/
 
     @Test
-    void delete() {
+    void delete() throws EntityMissingException, EntityContainsElementsException {
         planetRepository.deleteById(planet1.getId());
         planetService.delete(planet1.getId());
         assertEquals(Optional.empty(), planetService.findById(planet1.getId()));
         verify(planetRepository, atLeastOnce()).deleteById(planet1.getId());
 
-    }
-
-    /*================================================================================================================*/
-
-    @Test
-    void customerAddResidence() throws EntityMissingException {
-        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
-        given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
-
-        List<Customer> expectedList = planet1.getInhabitants();
-        expectedList.add(customer1);
-        Planet updated = planetService.customerAddResidence(customer1.getId(), planet1.getId());
-        assertEquals(planet1.getCoordinate(), updated.getCoordinate());
-        assertEquals(planet1.getId(), updated.getId());
-        assertEquals(planet1.getName(), updated.getName());
-        assertEquals(planet1.getNativeRace(), updated.getNativeRace());
-        assertEquals(planet1.getTerritory(), updated.getTerritory());
-        assertEquals(expectedList, updated.getInhabitants());
-
-        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
-        verify(customerRepository, atLeastOnce()).findById(customer1.getId());
     }
 }

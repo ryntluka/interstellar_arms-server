@@ -26,8 +26,7 @@ public class PlanetDTOAssembler extends RepresentationModelAssemblerSupport<Plan
                 entity.getName(),
                 entity.getCoordinate(),
                 entity.getTerritory(),
-                entity.getNativeRace(),
-                entity.getInhabitants().stream().map(Customer::getId).collect(Collectors.toList()));
+                entity.getNativeRace());
         res.add(
                 linkTo(
                         methodOn(PlanetController.class).findById(res.getId())

@@ -2,7 +2,6 @@ package cz.cvut.fit.ryntluka.customer;
 
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.Optional;
 
 import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
@@ -49,6 +49,7 @@ public class CustomerControllerTest {
                 andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
                 andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
                 andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.planetId", CoreMatchers.is(customer1.getPlanet().getId()))).
                 andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 
@@ -57,7 +58,7 @@ public class CustomerControllerTest {
 
     @Test
     void findByName() throws Exception {
-        given(customerService.findByLastName(customer1.getLastName())).willReturn(Optional.of(customer1));
+        given(customerService.findAllByLastName(customer1.getLastName())).willReturn(List.of(customer1));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.
@@ -65,14 +66,15 @@ public class CustomerControllerTest {
                         accept(CONTENT_TYPE).
                         contentType(CONTENT_TYPE)).
                 andExpect(status().isOk()).
-                andExpect(jsonPath("$.id", CoreMatchers.is(customer1.getId()))).
-                andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
-                andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
-                andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
-                andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
-                andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
+                andExpect(jsonPath("$.[0].id", CoreMatchers.is(customer1.getId()))).
+                andExpect(jsonPath("$.[0].firstName", CoreMatchers.is(customer1.getFirstName()))).
+                andExpect(jsonPath("$.[0].lastName", CoreMatchers.is(customer1.getLastName()))).
+                andExpect(jsonPath("$.[0].email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.[0].planetId", CoreMatchers.is(customer1.getPlanet().getId()))).
+                andExpect(jsonPath("$.[0].links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
+                andExpect(jsonPath("$.[0].links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 
-        verify(customerService, atLeastOnce()).findByLastName(customer1.getLastName());
+        verify(customerService, atLeastOnce()).findAllByLastName(customer1.getLastName());
     }
 
     @Test
@@ -103,6 +105,7 @@ public class CustomerControllerTest {
                 andExpect(jsonPath("$.firstName", CoreMatchers.is(customer1.getFirstName()))).
                 andExpect(jsonPath("$.lastName", CoreMatchers.is(customer1.getLastName()))).
                 andExpect(jsonPath("$.email", CoreMatchers.is(customer1.getEmail()))).
+                andExpect(jsonPath("$.planetId", CoreMatchers.is(customer1.getPlanet().getId()))).
                 andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
         verify(customerService, atLeastOnce()).create(createDTO(customer1));
@@ -124,6 +127,7 @@ public class CustomerControllerTest {
                 andExpect(jsonPath("$.firstName", CoreMatchers.is(customer2.getFirstName()))).
                 andExpect(jsonPath("$.lastName", CoreMatchers.is(customer2.getLastName()))).
                 andExpect(jsonPath("$.email", CoreMatchers.is(customer2.getEmail()))).
+                andExpect(jsonPath("$.planetId", CoreMatchers.is(customer1.getPlanet().getId()))).
                 andExpect(jsonPath("$.links[0].href", CoreMatchers.endsWith(ROOT_URL + '/' + customer1.getId()))).
                 andExpect(jsonPath("$.links[1].href", CoreMatchers.endsWith(ROOT_URL)));
 

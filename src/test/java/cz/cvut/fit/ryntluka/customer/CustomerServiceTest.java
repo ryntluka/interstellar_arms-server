@@ -1,10 +1,10 @@
 package cz.cvut.fit.ryntluka.customer;
 
 import cz.cvut.fit.ryntluka.dto.CustomerCreateDTO;
-import cz.cvut.fit.ryntluka.dto.CustomerDTO;
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.repository.CustomerRepository;
+import cz.cvut.fit.ryntluka.repository.PlanetRepository;
 import cz.cvut.fit.ryntluka.service.CustomerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cz.cvut.fit.ryntluka.customer.CustomerObjects.*;
+import static cz.cvut.fit.ryntluka.planet.PlanetObjects.planet1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -30,6 +29,9 @@ public class CustomerServiceTest {
     @MockBean
     private CustomerRepository customerRepository;
 
+    @MockBean
+    private PlanetRepository planetRepository;
+
     @Autowired
     public CustomerServiceTest(CustomerService customerService) {
         this.customerService = customerService;
@@ -38,10 +40,12 @@ public class CustomerServiceTest {
     /*================================================================================================================*/
 
     @Test
-    void create() {
+    void create() throws EntityMissingException {
+        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
         given(customerRepository.save(customer1)).willReturn(customer1);
         assertEquals(customer1, customerService.create(createDTO(customer1)));
         verify(customerRepository, atLeastOnce()).save(customer1);
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
     }
 
     /*================================================================================================================*/
@@ -54,11 +58,11 @@ public class CustomerServiceTest {
     }
 
     @Test
-    void findByName() throws EntityMissingException {
-        given(customerRepository.findByLastName(customer1.getLastName())).willReturn(Optional.of(customer1));
-        Customer res = customerService.findByLastName(customer1.getLastName()).orElseThrow(EntityMissingException::new);
-        assertEquals(customer1, res);
-        verify(customerRepository, Mockito.atLeastOnce()).findByLastName(customer1.getLastName());
+    void findAllByName() {
+        given(customerRepository.findAllByLastName(customer1.getLastName())).willReturn(List.of(customer1));
+        List<Customer> res = customerService.findAllByLastName(customer1.getLastName());
+        assertEquals(customer1, res.get(0));
+        verify(customerRepository, Mockito.atLeastOnce()).findAllByLastName(customer1.getLastName());
     }
 
     @Test
@@ -92,6 +96,7 @@ public class CustomerServiceTest {
 
     @Test
     void update() throws EntityMissingException {
+        given(planetRepository.findById(planet1.getId())).willReturn(Optional.of(planet1));
         CustomerCreateDTO newData = createDTO(customer2);
         given(customerRepository.findById(customer1.getId())).willReturn(Optional.of(customer1));
         Customer updated = customerService.update(customer1.getId(), newData);
@@ -100,14 +105,16 @@ public class CustomerServiceTest {
         assertEquals(updated.getFirstName(), newData.getFirstName());
         assertEquals(updated.getLastName(), newData.getLastName());
         assertEquals(updated.getId(), customer1.getId());
+        assertEquals(updated.getPlanet(), customer2.getPlanet());
 
-        verify(customerRepository, Mockito.atLeastOnce()).findById(customer1.getId());
+        verify(customerRepository, atLeastOnce()).findById(customer1.getId());
+        verify(planetRepository, atLeastOnce()).findById(planet1.getId());
     }
 
     /*================================================================================================================*/
 
     @Test
-    void delete() {
+    void delete() throws EntityMissingException {
         customerRepository.deleteById(customer1.getId());
         customerService.delete(customer1.getId());
         assertEquals(Optional.empty(), customerService.findById(customer1.getId()));

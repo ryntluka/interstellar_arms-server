@@ -10,14 +10,12 @@ public class PlanetCreateDTO {
     private final Point coordinate;
     private final String territory;
     private final String nativeRace;
-    private final List<Integer> inhabitantsIds;
 
-    public PlanetCreateDTO(String name, Point coordinate, String territory, String nativeRace, List<Integer> inhabitantsIds) {
+    public PlanetCreateDTO(String name, Point coordinate, String territory, String nativeRace) {
         this.name = name;
         this.coordinate = coordinate;
         this.territory = territory;
         this.nativeRace = nativeRace;
-        this.inhabitantsIds = inhabitantsIds;
     }
 
     public String getName() {
@@ -36,13 +34,9 @@ public class PlanetCreateDTO {
         return nativeRace;
     }
 
-    public List<Integer> getInhabitantsIds() {
-        return inhabitantsIds;
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(name, coordinate, territory, nativeRace, inhabitantsIds);
+        return Objects.hash(name, coordinate, territory, nativeRace);
     }
 
     @Override
@@ -55,8 +49,6 @@ public class PlanetCreateDTO {
         return Objects.equals(name, planet.name)
                 && Objects.equals(coordinate, planet.coordinate)
                 && Objects.equals(territory, planet.territory)
-                && Objects.equals(nativeRace, planet.nativeRace)
-                && (Objects.equals(inhabitantsIds, planet.inhabitantsIds)
-                || inhabitantsIds.isEmpty() && planet.inhabitantsIds == null);
+                && Objects.equals(nativeRace, planet.nativeRace);
     }
 }

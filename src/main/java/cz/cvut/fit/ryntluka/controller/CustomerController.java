@@ -41,17 +41,20 @@ public class CustomerController {
     }
 
     @GetMapping(params = {"name"})
-    public CustomerDTO findByName(@RequestParam String name) {
-        return customerDTOAssembler.toModel(
-                customerService.findByLastName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-        );
+    public List<CustomerDTO> findByName(@RequestParam String name) {
+        return customerService.findAllByLastName(name).stream().map(customerDTOAssembler::toModel).collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<CustomerDTO> create(@RequestBody CustomerCreateDTO customer) {
-        CustomerDTO inserted = customerDTOAssembler.toModel(
-                customerService.create(customer)
-        );
+        CustomerDTO inserted = null;
+        try {
+            inserted = customerDTOAssembler.toModel(
+                    customerService.create(customer)
+            );
+        } catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         return ResponseEntity
                 .created(Link.of("http://localhost:8080/api/customers/" + inserted.getId()).toUri())
                 .body(inserted);
@@ -72,7 +75,11 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
-        customerService.delete(id);
+        try {
+            customerService.delete(id);
+        } catch (EntityMissingException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 }
 

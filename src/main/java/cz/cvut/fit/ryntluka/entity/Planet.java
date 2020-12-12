@@ -25,20 +25,14 @@ public class Planet {
 
     private String nativeRace;
 
-    @OneToMany
-    @JoinColumn(name="inhabitants")
-    private List<Customer> inhabitants;
-
     public Planet() {
     }
 
-    public Planet(String name, Point coordinate, String territory, String nativeRace, List<Customer> inhabitants) {
+    public Planet(String name, Point coordinate, String territory, String nativeRace) {
         this.name = name;
         this.coordinate = coordinate;
         this.territory = territory;
         this.nativeRace = nativeRace;
-        this.inhabitants = inhabitants;
-
     }
 
     public int getId() {
@@ -77,17 +71,9 @@ public class Planet {
         this.nativeRace = natives;
     }
 
-    public List<Customer> getInhabitants() {
-        return inhabitants;
-    }
-
-    public void setInhabitants(List<Customer> inhabitants) {
-        this.inhabitants = inhabitants;
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, coordinate, territory, nativeRace, inhabitants);
+        return Objects.hash(id, name, coordinate, territory, nativeRace);
     }
 
     @Override
@@ -101,8 +87,6 @@ public class Planet {
                 && Objects.equals(name, planet.name)
                 && Objects.equals(coordinate, planet.coordinate)
                 && Objects.equals(territory, planet.territory)
-                && Objects.equals(nativeRace, planet.nativeRace)
-                && (Objects.equals(inhabitants, planet.inhabitants)
-                    || inhabitants.isEmpty() && planet.inhabitants == null);
+                && Objects.equals(nativeRace, planet.nativeRace);
     }
 }

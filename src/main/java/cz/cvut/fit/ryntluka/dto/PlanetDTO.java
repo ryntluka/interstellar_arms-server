@@ -17,15 +17,13 @@ public class PlanetDTO extends RepresentationModel<PlanetDTO>  {
     private final Point coordinate;
     private final String territory;
     private final String nativeRace;
-    private final List<Integer> inhabitantsIds;
 
-    public PlanetDTO(int id, String name, Point coordinate, String territory, String nativeRace, List<Integer> inhabitantsIds) {
+    public PlanetDTO(int id, String name, Point coordinate, String territory, String nativeRace) {
         this.id = id;
         this.name = name;
         this.coordinate = coordinate;
         this.territory = territory;
         this.nativeRace = nativeRace;
-        this.inhabitantsIds = inhabitantsIds;
     }
 
     public int getId() {
@@ -48,13 +46,9 @@ public class PlanetDTO extends RepresentationModel<PlanetDTO>  {
         return nativeRace;
     }
 
-    public List<Integer> getInhabitantsIds() {
-        return inhabitantsIds;
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, coordinate, territory, nativeRace, inhabitantsIds);
+        return Objects.hash(id, name, coordinate, territory, nativeRace);
     }
 
     @Override
@@ -68,8 +62,6 @@ public class PlanetDTO extends RepresentationModel<PlanetDTO>  {
                 && Objects.equals(name, planet.name)
                 && Objects.equals(coordinate, planet.coordinate)
                 && Objects.equals(territory, planet.territory)
-                && Objects.equals(nativeRace, planet.nativeRace)
-                && (Objects.equals(inhabitantsIds, planet.inhabitantsIds)
-                    || inhabitantsIds.isEmpty() && planet.inhabitantsIds == null);
+                && Objects.equals(nativeRace, planet.nativeRace);
     }
 }

@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cz.cvut.fit.ryntluka.customer.CustomerObjects.customer1;
+
 public class ProductObjects {
     public static Product product1 = new Product(12,"DL-44 heavy blaster pistol", new ArrayList<>());
+    public static Product product1_ordered = new Product(12,"DL-44 heavy blaster pistol", List.of(customer1));
     public static Product product2 = new Product(31589,"X-Wing", new ArrayList<>());
     public static Product product3 = new Product(46,"AAT", new ArrayList<>());
     public static Product product4 = new Product(544932187,"Death Star", new ArrayList<>());

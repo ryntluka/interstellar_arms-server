@@ -18,7 +18,7 @@ public class CustomerDTOAssembler extends RepresentationModelAssemblerSupport<Cu
 
     @Override
     public CustomerDTO toModel(Customer entity) {
-        CustomerDTO res = new CustomerDTO(entity.getId(), entity.getFirstName(), entity.getLastName(), entity.getEmail());
+        CustomerDTO res = new CustomerDTO(entity.getId(), entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPlanet().getId());
         res.add(
                 linkTo(
                         methodOn(CustomerController.class).findById(res.getId())

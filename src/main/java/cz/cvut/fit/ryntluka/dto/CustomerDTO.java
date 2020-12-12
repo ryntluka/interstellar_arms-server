@@ -1,12 +1,7 @@
 package cz.cvut.fit.ryntluka.dto;
 
-import com.sun.istack.NotNull;
-import cz.cvut.fit.ryntluka.entity.Customer;
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.util.Objects;
 
 public class CustomerDTO extends RepresentationModel<CustomerDTO> {
@@ -15,14 +10,16 @@ public class CustomerDTO extends RepresentationModel<CustomerDTO> {
     private final String firstName;
     private final String lastName;
     private final String email;
+    private final int planetId;
 
-    public CustomerDTO(int id, String firstName, String lastName, String email)
+    public CustomerDTO(int id, String firstName, String lastName, String email, int planetId)
 
     {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.planetId = planetId;
     }
 
     public int getId() {
@@ -39,6 +36,10 @@ public class CustomerDTO extends RepresentationModel<CustomerDTO> {
 
     public String getEmail() {
         return email;
+    }
+
+    public int getPlanetId() {
+        return planetId;
     }
 
     @Override

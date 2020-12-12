@@ -4,6 +4,7 @@ import cz.cvut.fit.ryntluka.dto.PlanetCreateDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetDTO;
 import cz.cvut.fit.ryntluka.dto.PlanetDTOAssembler;
 import cz.cvut.fit.ryntluka.entity.Planet;
+import cz.cvut.fit.ryntluka.exceptions.EntityContainsElementsException;
 import cz.cvut.fit.ryntluka.exceptions.EntityMissingException;
 import cz.cvut.fit.ryntluka.service.PlanetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,19 +45,13 @@ public class PlanetController {
     }
 
     @GetMapping(params = {"name"})
-    public PlanetDTO findByName(@RequestParam String name) {
-        return planetDTOAssembler.toModel(
-                planetService.findByName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-        );
+    public List<PlanetDTO> findByName(@RequestParam String name) {
+        return planetService.findAllByName(name).stream().map(planetDTOAssembler::toModel).collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<PlanetDTO> create(@RequestBody PlanetCreateDTO planet) {
         PlanetDTO inserted;
-        Planet planet1 = new Planet("Coruscant",
-                new Point(2341, 563), "Core Worlds", "Human",
-                new ArrayList<>()
-        );
         try{
             inserted = planetDTOAssembler.toModel(
                     planetService.create(planet)
@@ -86,17 +81,11 @@ public class PlanetController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
-        planetService.delete(id);
-    }
-
-    @PutMapping(value = {"/{id}"}, params = {"customerId"})
-    public PlanetDTO addResidence(@PathVariable int id, @RequestParam int customerId) {
         try {
-            return planetDTOAssembler.toModel(
-                    planetService.customerAddResidence(customerId, id)
-            );
-        }
-        catch (EntityMissingException e) {
+            planetService.delete(id);
+        } catch (EntityContainsElementsException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        } catch (EntityMissingException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
