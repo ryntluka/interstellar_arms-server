@@ -58,8 +58,8 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public Optional<Product> findByName (String name) {
-        return productRepository.findByName(name);
+    public List<Product> findAllByName (String name) {
+        return productRepository.findAllByName(name);
     }
 
     /*================================================================================================================*/

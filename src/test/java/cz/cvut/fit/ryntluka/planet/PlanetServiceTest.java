@@ -61,7 +61,7 @@ public class PlanetServiceTest {
     }
 
     @Test
-    void findByName() throws EntityMissingException {
+    void findByName() {
         given(planetRepository.findAllByName(planet1.getName())).willReturn(List.of(planet1));
         List<Planet> res = planetService.findAllByName(planet1.getName());
         assertEquals(planet1, res.get(0));
