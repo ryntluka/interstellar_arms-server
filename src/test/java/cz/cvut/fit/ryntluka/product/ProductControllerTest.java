@@ -2,9 +2,7 @@ package cz.cvut.fit.ryntluka.product;
 
 import cz.cvut.fit.ryntluka.entity.Customer;
 import cz.cvut.fit.ryntluka.service.ProductService;
-import org.aspectj.lang.annotation.Before;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

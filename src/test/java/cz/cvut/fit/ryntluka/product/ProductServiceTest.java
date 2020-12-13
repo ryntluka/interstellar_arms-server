@@ -49,6 +49,7 @@ public class ProductServiceTest {
     void create() throws EntityMissingException {
         given(productRepository.save(product1)).willReturn(product1);
         assertEquals(product1, productService.create(createDTO(product1)));
+        verify(productRepository, atLeastOnce()).save(product1);
     }
 
     /*================================================================================================================*/
